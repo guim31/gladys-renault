@@ -7,10 +7,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { DEVICE_BLUEPRINTS, SCENE_TRIGGER_KEYS } from '../src/devices/index.js';
-import { SCENE_ACTIONS } from '../src/scenes.js';
-import { WIDGETS } from '../src/widgets.js';
+import { ACTION_KEYS } from '../src/app.js';
+import { SCENE_TRIGGER_KEYS as TRIGGERS } from '../src/renault.js';
+import { createSceneActions } from '../src/scenes.js';
+import { createWidgets } from '../src/widgets.js';
 import { DEFAULT_CONFIG } from '../src/config.js';
+import { LOCALE_CODES } from '../src/renault/locales.js';
 
 const manifest = JSON.parse(
   await readFile(new URL('../gladys-assistant-integration.json', import.meta.url), 'utf8'),
@@ -29,8 +31,9 @@ const allFields = [
   ...(manifest.widgets ?? []).flatMap((widget) => widget.settings ?? []),
 ];
 
-// Actions registered outside the blueprints (see index.js).
-const REGISTRY_LEVEL_ACTIONS = ['identify'];
+const SCENE_ACTIONS = createSceneActions({});
+const WIDGETS = createWidgets({});
+const SCENE_TRIGGER_KEYS = Object.values(TRIGGERS);
 
 // Manifest fields older Gladys releases reject as unknown, with the first
 // release accepting them. The store validator refuses a manifest whose
@@ -57,14 +60,43 @@ function isAtLeast(version, required) {
   return true;
 }
 
-test('every manifest action has a registered handler', () => {
-  const handled = new Set([
-    ...DEVICE_BLUEPRINTS.flatMap((bp) => Object.keys(bp.actions ?? {})),
-    ...REGISTRY_LEVEL_ACTIONS,
-  ]);
-  for (const action of manifest.actions ?? []) {
-    assert.ok(handled.has(action.key), `manifest action "${action.key}" has no handler`);
+test('every manifest action has a registered handler, and vice versa', () => {
+  assert.deepEqual(keysOf(manifest.actions).sort(), Object.values(ACTION_KEYS).sort());
+});
+
+test('actions declare no secret field and no default (the core ignores both)', () => {
+  // GladysAssistant/Gladys#3154 and #3155: a secret field of an action cannot
+  // be filled, and an action applies no default.
+  for (const action of manifest.actions) {
+    for (const field of action.fields ?? []) {
+      assert.notEqual(field.type, 'secret', `${action.key}.${field.key}`);
+      assert.equal(field.default, undefined, `${action.key}.${field.key}`);
+    }
   }
+});
+
+test('the locale select offers exactly the locales the client knows', () => {
+  const locale = manifest.config_schema.find((field) => field.key === 'locale');
+  assert.deepEqual(
+    locale.options.map((option) => option.value),
+    LOCALE_CODES,
+  );
+});
+
+test('number fields have integer bounds and defaults (the form has no step)', () => {
+  for (const field of allFields.filter((f) => f.type === 'number')) {
+    for (const key of ['min', 'max', 'default']) {
+      if (field[key] !== undefined) assert.ok(Number.isInteger(field[key]), `${field.key}.${key}`);
+    }
+  }
+});
+
+test('the manifest describes this integration: name, cloud transport, images', () => {
+  assert.equal(manifest.name, 'Renault / Dacia');
+  assert.ok(manifest.name.length >= 3 && manifest.name.length <= 30);
+  assert.deepEqual(manifest.transports, ['cloud']);
+  assert.match(manifest.docker_image, /^ghcr\.io\/guim31\/gladys-renault:/);
+  assert.match(manifest.cover_image, /guim31\/gladys-renault\/main\/cover\.png$/);
 });
 
 test('declaring catalog categories requires Gladys >= 4.86.0', () => {
@@ -82,7 +114,7 @@ test('declaring catalog categories requires Gladys >= 4.86.0', () => {
 
 test('declaring scene triggers, scene actions or widgets requires Gladys >= 5.1.0', () => {
   const declared = CAPABILITY_FIELDS.filter((field) => manifest[field] !== undefined);
-  assert.ok(declared.length > 0, 'the template demonstrates the capability fields');
+  assert.ok(declared.length > 0, 'the integration declares capability fields');
   assert.ok(
     isAtLeast(minGladysVersion(), CAPABILITY_MIN_GLADYS_VERSION),
     `${declared.join(', ')} requires gladys_version >= 5.1.0, got "${manifest.gladys_version}"`,
@@ -135,7 +167,7 @@ test('config_schema defaults stay consistent with DEFAULT_CONFIG', () => {
 
 test('section fields are purely presentational', () => {
   const sections = manifest.config_schema.filter((f) => f.type === 'section');
-  assert.ok(sections.length > 0, 'the template demonstrates at least one section block');
+  assert.ok(sections.length > 0, 'the configuration opens with a section block');
   for (const section of sections) {
     // A section stores NO value: declaring `required`, `default` or
     // `placeholder` on it rejects the manifest, and its key must never leak
@@ -160,7 +192,7 @@ test('section fields are purely presentational', () => {
 
 test('dynamic selects declare a source and no static options', () => {
   const dynamicSelects = allFields.filter((f) => f.source !== undefined);
-  assert.ok(dynamicSelects.length > 0, 'the template demonstrates a dynamic select');
+  assert.ok(dynamicSelects.length > 0, 'the vehicles are picked from a dynamic select');
   for (const field of dynamicSelects) {
     assert.equal(field.source, 'devices', 'the only core-defined source in V1 is "devices"');
     assert.equal(
@@ -196,7 +228,7 @@ test('the catalog description holds 10 to 100 characters per language', () => {
 test('field placeholders are multi-language objects', () => {
   // Like `label` and `description`: a plain string rejects the manifest.
   const withPlaceholder = allFields.filter((f) => f.placeholder !== undefined);
-  assert.ok(withPlaceholder.length > 0, 'the template demonstrates a placeholder');
+  assert.ok(withPlaceholder.length > 0, 'some fields show a placeholder');
   for (const field of withPlaceholder) {
     assert.equal(typeof field.placeholder, 'object', `field "${field.key}": placeholder`);
     assert.ok(field.placeholder.en, `field "${field.key}": placeholder needs an English text`);

@@ -1,101 +1,589 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Renault / Dacia",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Renault and Dacia electric and plug-in hybrid cars: battery, charging, preconditioning.",
+    "fr": "Voitures électriques et hybrides Renault et Dacia : batterie, charge, préconditionnement.",
+    "de": "Elektro- und Plug-in-Hybridautos von Renault und Dacia: Batterie, Laden, Vorklimatisierung.",
+    "es": "Coches eléctricos e híbridos enchufables Renault y Dacia: batería, carga, preacondicionamiento."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-renault:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-renault/main/cover.png",
+  "categories": ["energy"],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Before you start",
+        "fr": "Avant de commencer",
+        "de": "Bevor du loslegst",
+        "es": "Antes de empezar"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "This integration signs in to your MY Renault or MY Dacia account, like the official app, and reads the state your cars last sent to the cloud (it never wakes them). If your account asks for a code sent by e-mail: save, click “Send the verification code”, then “Enter the code”. Not affiliated with Renault or Dacia.",
+        "fr": "Cette intégration se connecte à votre compte MY Renault ou MY Dacia, comme l'application officielle, et lit l'état que vos voitures ont envoyé au cloud (elle ne les réveille jamais). Si votre compte demande un code envoyé par e-mail : enregistrez, cliquez sur « Envoyer le code de vérification », puis « Saisir le code ». Sans lien avec Renault ou Dacia.",
+        "de": "Diese Integration meldet sich wie die offizielle App bei deinem MY-Renault- oder MY-Dacia-Konto an und liest den Zustand, den deine Autos zuletzt an die Cloud gesendet haben (sie weckt sie nie). Verlangt dein Konto einen per E-Mail gesendeten Code: Speichere, klicke auf „Bestätigungscode senden“, dann auf „Code eingeben“. Nicht mit Renault oder Dacia verbunden.",
+        "es": "Esta integración inicia sesión en su cuenta MY Renault o MY Dacia, como la aplicación oficial, y lee el estado que sus coches enviaron a la nube (nunca los despierta). Si su cuenta pide un código enviado por correo: guarde, pulse «Enviar el código de verificación» y luego «Introducir el código». Sin relación con Renault ni Dacia."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/guim31/gladys-renault/blob/main/docs/en.md",
+          "label": {
+            "en": "Documentation",
+            "fr": "Documentation",
+            "de": "Dokumentation",
+            "es": "Documentación"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
+      "key": "locale",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
-      "required": false,
-      "default": "celsius",
+      "label": {
+        "en": "Country of the account",
+        "fr": "Pays du compte",
+        "de": "Land des Kontos",
+        "es": "País de la cuenta"
+      },
+      "description": {
+        "en": "The country and language of your MY Renault / MY Dacia app: they decide the servers of the account.",
+        "fr": "Le pays et la langue de votre application MY Renault / MY Dacia : ils déterminent les serveurs du compte.",
+        "de": "Land und Sprache deiner MY-Renault-/MY-Dacia-App: Sie bestimmen die Server des Kontos.",
+        "es": "El país y el idioma de su aplicación MY Renault / MY Dacia: determinan los servidores de la cuenta."
+      },
+      "required": true,
+      "default": "fr_FR",
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "bg_BG",
+          "label": {
+            "en": "България — Български",
+            "fr": "България — Български",
+            "de": "България — Български",
+            "es": "България — Български"
+          }
+        },
+        {
+          "value": "cs_CZ",
+          "label": {
+            "en": "Česko — Čeština",
+            "fr": "Česko — Čeština",
+            "de": "Česko — Čeština",
+            "es": "Česko — Čeština"
+          }
+        },
+        {
+          "value": "da_DK",
+          "label": {
+            "en": "Danmark — Dansk",
+            "fr": "Danmark — Dansk",
+            "de": "Danmark — Dansk",
+            "es": "Danmark — Dansk"
+          }
+        },
+        {
+          "value": "de_DE",
+          "label": {
+            "en": "Deutschland — Deutsch",
+            "fr": "Deutschland — Deutsch",
+            "de": "Deutschland — Deutsch",
+            "es": "Deutschland — Deutsch"
+          }
+        },
+        {
+          "value": "de_AT",
+          "label": {
+            "en": "Österreich — Deutsch",
+            "fr": "Österreich — Deutsch",
+            "de": "Österreich — Deutsch",
+            "es": "Österreich — Deutsch"
+          }
+        },
+        {
+          "value": "de_CH",
+          "label": {
+            "en": "Schweiz — Deutsch",
+            "fr": "Schweiz — Deutsch",
+            "de": "Schweiz — Deutsch",
+            "es": "Schweiz — Deutsch"
+          }
+        },
+        {
+          "value": "en_AU",
+          "label": {
+            "en": "Australia — English",
+            "fr": "Australia — English",
+            "de": "Australia — English",
+            "es": "Australia — English"
+          }
+        },
+        {
+          "value": "en_GB",
+          "label": {
+            "en": "United Kingdom — English",
+            "fr": "United Kingdom — English",
+            "de": "United Kingdom — English",
+            "es": "United Kingdom — English"
+          }
+        },
+        {
+          "value": "en_IE",
+          "label": {
+            "en": "Ireland — English",
+            "fr": "Ireland — English",
+            "de": "Ireland — English",
+            "es": "Ireland — English"
+          }
+        },
+        {
+          "value": "es_ES",
+          "label": {
+            "en": "España — Español",
+            "fr": "España — Español",
+            "de": "España — Español",
+            "es": "España — Español"
+          }
+        },
+        {
+          "value": "es_MX",
+          "label": {
+            "en": "México — Español",
+            "fr": "México — Español",
+            "de": "México — Español",
+            "es": "México — Español"
+          }
+        },
+        {
+          "value": "fi_FI",
+          "label": {
+            "en": "Suomi — Suomi",
+            "fr": "Suomi — Suomi",
+            "de": "Suomi — Suomi",
+            "es": "Suomi — Suomi"
+          }
+        },
+        {
+          "value": "fr_FR",
+          "label": {
+            "en": "France — Français",
+            "fr": "France — Français",
+            "de": "France — Français",
+            "es": "France — Français"
+          }
+        },
+        {
+          "value": "fr_BE",
+          "label": {
+            "en": "Belgique — Français",
+            "fr": "Belgique — Français",
+            "de": "Belgique — Français",
+            "es": "Belgique — Français"
+          }
+        },
+        {
+          "value": "fr_CH",
+          "label": {
+            "en": "Suisse — Français",
+            "fr": "Suisse — Français",
+            "de": "Suisse — Français",
+            "es": "Suisse — Français"
+          }
+        },
+        {
+          "value": "fr_LU",
+          "label": {
+            "en": "Luxembourg — Français",
+            "fr": "Luxembourg — Français",
+            "de": "Luxembourg — Français",
+            "es": "Luxembourg — Français"
+          }
+        },
+        {
+          "value": "hr_HR",
+          "label": {
+            "en": "Hrvatska — Hrvatski",
+            "fr": "Hrvatska — Hrvatski",
+            "de": "Hrvatska — Hrvatski",
+            "es": "Hrvatska — Hrvatski"
+          }
+        },
+        {
+          "value": "hu_HU",
+          "label": {
+            "en": "Magyarország — Magyar",
+            "fr": "Magyarország — Magyar",
+            "de": "Magyarország — Magyar",
+            "es": "Magyarország — Magyar"
+          }
+        },
+        {
+          "value": "it_IT",
+          "label": {
+            "en": "Italia — Italiano",
+            "fr": "Italia — Italiano",
+            "de": "Italia — Italiano",
+            "es": "Italia — Italiano"
+          }
+        },
+        {
+          "value": "it_CH",
+          "label": {
+            "en": "Svizzera — Italiano",
+            "fr": "Svizzera — Italiano",
+            "de": "Svizzera — Italiano",
+            "es": "Svizzera — Italiano"
+          }
+        },
+        {
+          "value": "nl_NL",
+          "label": {
+            "en": "Nederland — Nederlands",
+            "fr": "Nederland — Nederlands",
+            "de": "Nederland — Nederlands",
+            "es": "Nederland — Nederlands"
+          }
+        },
+        {
+          "value": "nl_BE",
+          "label": {
+            "en": "België — Nederlands",
+            "fr": "België — Nederlands",
+            "de": "België — Nederlands",
+            "es": "België — Nederlands"
+          }
+        },
+        {
+          "value": "no_NO",
+          "label": {
+            "en": "Norge — Norsk",
+            "fr": "Norge — Norsk",
+            "de": "Norge — Norsk",
+            "es": "Norge — Norsk"
+          }
+        },
+        {
+          "value": "pl_PL",
+          "label": {
+            "en": "Polska — Polski",
+            "fr": "Polska — Polski",
+            "de": "Polska — Polski",
+            "es": "Polska — Polski"
+          }
+        },
+        {
+          "value": "pt_PT",
+          "label": {
+            "en": "Portugal — Português",
+            "fr": "Portugal — Português",
+            "de": "Portugal — Português",
+            "es": "Portugal — Português"
+          }
+        },
+        {
+          "value": "ro_RO",
+          "label": {
+            "en": "România — Română",
+            "fr": "România — Română",
+            "de": "România — Română",
+            "es": "România — Română"
+          }
+        },
+        {
+          "value": "ru_RU",
+          "label": {
+            "en": "Россия — Русский",
+            "fr": "Россия — Русский",
+            "de": "Россия — Русский",
+            "es": "Россия — Русский"
+          }
+        },
+        {
+          "value": "sk_SK",
+          "label": {
+            "en": "Slovensko — Slovenčina",
+            "fr": "Slovensko — Slovenčina",
+            "de": "Slovensko — Slovenčina",
+            "es": "Slovensko — Slovenčina"
+          }
+        },
+        {
+          "value": "sl_SI",
+          "label": {
+            "en": "Slovenija — Slovenščina",
+            "fr": "Slovenija — Slovenščina",
+            "de": "Slovenija — Slovenščina",
+            "es": "Slovenija — Slovenščina"
+          }
+        },
+        {
+          "value": "sv_SE",
+          "label": {
+            "en": "Sverige — Svenska",
+            "fr": "Sverige — Svenska",
+            "de": "Sverige — Svenska",
+            "es": "Sverige — Svenska"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "username",
+      "type": "string",
+      "label": {
+        "en": "E-mail address",
+        "fr": "Adresse e-mail",
+        "de": "E-Mail-Adresse",
+        "es": "Correo electrónico"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "The e-mail address of your MY Renault or MY Dacia account.",
+        "fr": "L'adresse e-mail de votre compte MY Renault ou MY Dacia.",
+        "de": "Die E-Mail-Adresse deines MY-Renault- oder MY-Dacia-Kontos.",
+        "es": "La dirección de correo de su cuenta MY Renault o MY Dacia."
+      },
+      "placeholder": {
+        "en": "name@example.com",
+        "fr": "nom@exemple.fr",
+        "de": "name@beispiel.de",
+        "es": "nombre@ejemplo.es"
+      },
+      "required": true
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Password",
+        "fr": "Mot de passe",
+        "de": "Passwort",
+        "es": "Contraseña"
+      },
+      "description": {
+        "en": "Used to sign in only: the session it opens is then kept in the integration's storage.",
+        "fr": "Sert uniquement à se connecter : la session ouverte est ensuite conservée dans le stockage de l'intégration.",
+        "de": "Dient nur zur Anmeldung: Die geöffnete Sitzung wird danach im Speicher der Integration aufbewahrt.",
+        "es": "Solo sirve para iniciar sesión: la sesión abierta se conserva después en el almacenamiento de la integración."
+      },
+      "required": true
+    },
+    {
+      "key": "account_id",
+      "type": "string",
+      "label": {
+        "en": "Account (optional)",
+        "fr": "Compte (facultatif)",
+        "de": "Konto (optional)",
+        "es": "Cuenta (opcional)"
+      },
+      "description": {
+        "en": "Empty: the cars of every account of the person. To keep one account, enter the id shown by “Test the connection”.",
+        "fr": "Vide : les voitures de tous les comptes de la personne. Pour n'en garder qu'un, saisissez l'identifiant donné par « Tester la connexion ».",
+        "de": "Leer: die Autos aller Konten der Person. Um nur ein Konto zu nutzen, gib die von „Verbindung testen“ angezeigte ID ein.",
+        "es": "Vacío: los coches de todas las cuentas de la persona. Para usar solo una, introduzca el identificador que da «Probar la conexión»."
+      },
+      "required": false
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Device names language",
+        "fr": "Langue des noms d'appareils",
+        "de": "Sprache der Gerätenamen",
+        "es": "Idioma de los nombres"
+      },
+      "description": {
+        "en": "Language of the feature names given to new devices (Gladys keeps a name once the device is created).",
+        "fr": "Langue des noms de fonctionnalités des nouveaux appareils (Gladys garde un nom une fois l'appareil créé).",
+        "de": "Sprache der Funktionsnamen neuer Geräte (Gladys behält einen Namen, sobald das Gerät erstellt ist).",
+        "es": "Idioma de los nombres de las funciones de los nuevos dispositivos (Gladys conserva un nombre una vez creado el dispositivo)."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ]
+    },
+    {
+      "key": "refresh_minutes",
+      "type": "select",
+      "label": {
+        "en": "Refresh",
+        "fr": "Relevé",
+        "de": "Abfrage",
+        "es": "Actualización"
+      },
+      "description": {
+        "en": "How often the cloud is read. It never wakes the car; several cars stretch it to stay within the cloud quota.",
+        "fr": "Fréquence de lecture du cloud. Elle ne réveille jamais la voiture ; plusieurs voitures l'allongent pour rester dans le quota du cloud.",
+        "de": "Wie oft die Cloud gelesen wird. Das weckt das Auto nie; mehrere Autos verlängern den Abstand, um im Kontingent der Cloud zu bleiben.",
+        "es": "Frecuencia de lectura de la nube. Nunca despierta el coche; con varios coches se alarga para respetar la cuota de la nube."
+      },
+      "required": false,
+      "default": "15",
+      "options": [
+        {
+          "value": "10",
+          "label": {
+            "en": "Every 10 minutes",
+            "fr": "Toutes les 10 minutes",
+            "de": "Alle 10 Minuten",
+            "es": "Cada 10 minutos"
+          }
+        },
+        {
+          "value": "15",
+          "label": {
+            "en": "Every 15 minutes",
+            "fr": "Toutes les 15 minutes",
+            "de": "Alle 15 Minuten",
+            "es": "Cada 15 minutos"
+          }
+        },
+        {
+          "value": "30",
+          "label": {
+            "en": "Every 30 minutes",
+            "fr": "Toutes les 30 minutes",
+            "de": "Alle 30 Minuten",
+            "es": "Cada 30 minutos"
+          }
+        },
+        {
+          "value": "60",
+          "label": {
+            "en": "Every hour",
+            "fr": "Toutes les heures",
+            "de": "Stündlich",
+            "es": "Cada hora"
+          }
+        }
+      ]
+    },
+    {
+      "key": "gps",
+      "type": "boolean",
+      "label": {
+        "en": "GPS position",
+        "fr": "Position GPS",
+        "de": "GPS-Position",
+        "es": "Posición GPS"
+      },
+      "description": {
+        "en": "Off by default (privacy). On: the last position the car sent is read and shown in Gladys.",
+        "fr": "Désactivée par défaut (vie privée). Activée : la dernière position envoyée par la voiture est lue et affichée dans Gladys.",
+        "de": "Standardmäßig aus (Privatsphäre). An: Die zuletzt vom Auto gesendete Position wird gelesen und in Gladys angezeigt.",
+        "es": "Desactivada por defecto (privacidad). Activada: se lee y muestra en Gladys la última posición enviada por el coche."
+      },
+      "required": false,
+      "default": false
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Signs in and lists the vehicles of the saved account. No car is woken.",
+        "fr": "Se connecte et liste les véhicules du compte enregistré. Aucune voiture n'est réveillée.",
+        "de": "Meldet sich an und listet die Fahrzeuge des gespeicherten Kontos auf. Kein Auto wird geweckt.",
+        "es": "Inicia sesión y muestra los vehículos de la cuenta guardada. No se despierta ningún coche."
+      },
+      "timeout_seconds": 60
     },
     {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
+      "key": "send_verification_code",
+      "label": {
+        "en": "Send the verification code",
+        "fr": "Envoyer le code de vérification",
+        "de": "Bestätigungscode senden",
+        "es": "Enviar el código de verificación"
+      },
+      "description": {
+        "en": "Only if your account asks for it: e-mails a code to the address of the account.",
+        "fr": "Seulement si votre compte le demande : envoie un code par e-mail à l'adresse du compte.",
+        "de": "Nur wenn dein Konto es verlangt: sendet einen Code an die E-Mail-Adresse des Kontos.",
+        "es": "Solo si su cuenta lo pide: envía un código al correo de la cuenta."
+      },
+      "timeout_seconds": 60
+    },
+    {
+      "key": "verify_code",
+      "label": {
+        "en": "Enter the code",
+        "fr": "Saisir le code",
+        "de": "Code eingeben",
+        "es": "Introducir el código"
+      },
+      "description": {
+        "en": "The code of the e-mail just received. This installation is then remembered for about 30 days.",
+        "fr": "Le code de l'e-mail que vous venez de recevoir. Cette installation est ensuite reconnue pendant 30 jours environ.",
+        "de": "Der Code aus der gerade erhaltenen E-Mail. Diese Installation wird danach etwa 30 Tage lang wiedererkannt.",
+        "es": "El código del correo que acaba de recibir. Esta instalación se reconoce después durante unos 30 días."
+      },
+      "timeout_seconds": 60,
       "fields": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "key": "code",
+          "type": "string",
+          "label": {
+            "en": "Code",
+            "fr": "Code",
+            "de": "Code",
+            "es": "Código"
+          },
+          "placeholder": {
+            "en": "e.g. 123456",
+            "fr": "ex. 123456",
+            "de": "z. B. 123456",
+            "es": "p. ej. 123456"
+          },
           "required": true
         }
       ]
@@ -103,75 +591,229 @@
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "charge_finished",
+      "label": {
+        "en": "Charge finished",
+        "fr": "Charge terminée",
+        "de": "Laden beendet",
+        "es": "Carga terminada"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "The car stopped charging while still plugged in (charge complete or stopped by the car or the charger).",
+        "fr": "La voiture a cessé de charger en restant branchée (charge complète, ou arrêtée par la voiture ou la borne).",
+        "de": "Das Auto hat aufgehört zu laden und ist noch angeschlossen (voll oder vom Auto oder der Ladestation gestoppt).",
+        "es": "El coche ha dejado de cargar y sigue enchufado (carga completa, o detenida por el coche o el cargador)."
       },
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
-        },
-        {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
-          "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
-          ]
+          "label": {
+            "en": "Vehicle",
+            "fr": "Véhicule",
+            "de": "Fahrzeug",
+            "es": "Vehículo"
+          },
+          "required": false
         }
       ],
       "variables": [
         {
-          "key": "target",
-          "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "key": "battery_level",
+          "type": "number",
+          "label": {
+            "en": "Battery level (%)",
+            "fr": "Niveau de batterie (%)",
+            "de": "Batteriestand (%)",
+            "es": "Nivel de batería (%)"
+          }
+        },
+        {
+          "key": "range_km",
+          "type": "number",
+          "label": {
+            "en": "Range (km)",
+            "fr": "Autonomie (km)",
+            "de": "Reichweite (km)",
+            "es": "Autonomía (km)"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "refresh_vehicle",
+      "label": {
+        "en": "Refresh a Renault / Dacia",
+        "fr": "Actualiser une Renault / Dacia",
+        "de": "Renault / Dacia aktualisieren",
+        "es": "Actualizar un Renault / Dacia"
       },
-      "timeout_seconds": 15,
+      "description": {
+        "en": "Reads the state the car last sent to the cloud now (it does not wake the car), for the next actions of the scene.",
+        "fr": "Lit maintenant l'état que la voiture a envoyé au cloud (sans la réveiller), pour les actions suivantes de la scène.",
+        "de": "Liest jetzt den Zustand, den das Auto an die Cloud gesendet hat (ohne es zu wecken), für die nächsten Aktionen der Szene.",
+        "es": "Lee ahora el estado que el coche envió a la nube (sin despertarlo), para las siguientes acciones de la escena."
+      },
+      "timeout_seconds": 60,
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "label": {
+            "en": "Vehicle",
+            "fr": "Véhicule",
+            "de": "Fahrzeug",
+            "es": "Vehículo"
+          },
           "required": true
         }
       ],
       "outputs": [
         {
-          "key": "signalled",
+          "key": "battery_level",
+          "type": "number",
+          "label": {
+            "en": "Battery level (%)",
+            "fr": "Niveau de batterie (%)",
+            "de": "Batteriestand (%)",
+            "es": "Nivel de batería (%)"
+          }
+        },
+        {
+          "key": "range_km",
+          "type": "number",
+          "label": {
+            "en": "Range (km)",
+            "fr": "Autonomie (km)",
+            "de": "Reichweite (km)",
+            "es": "Autonomía (km)"
+          }
+        },
+        {
+          "key": "plugged",
           "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "label": {
+            "en": "Plugged in",
+            "fr": "Branchée",
+            "de": "Angeschlossen",
+            "es": "Enchufado"
+          }
+        },
+        {
+          "key": "charging",
+          "type": "boolean",
+          "label": {
+            "en": "Charging",
+            "fr": "En charge",
+            "de": "Lädt",
+            "es": "Cargando"
+          }
+        }
+      ]
+    },
+    {
+      "key": "start_preconditioning",
+      "label": {
+        "en": "Precondition a Renault / Dacia",
+        "fr": "Préconditionner une Renault / Dacia",
+        "de": "Renault / Dacia vorklimatisieren",
+        "es": "Preacondicionar un Renault / Dacia"
+      },
+      "description": {
+        "en": "Asks the car to heat or cool its cabin. The cloud accepting it does not mean the car did it.",
+        "fr": "Demande à la voiture de chauffer ou rafraîchir l'habitacle. Que le cloud l'accepte ne veut pas dire que la voiture l'a fait.",
+        "de": "Bittet das Auto, den Innenraum zu heizen oder zu kühlen. Nimmt die Cloud es an, heißt das nicht, dass das Auto es getan hat.",
+        "es": "Pide al coche calentar o enfriar el habitáculo. Que la nube lo acepte no significa que el coche lo haya hecho."
+      },
+      "timeout_seconds": 60,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Vehicle",
+            "fr": "Véhicule",
+            "de": "Fahrzeug",
+            "es": "Vehículo"
+          },
+          "required": true
+        },
+        {
+          "key": "temperature",
+          "type": "number",
+          "label": {
+            "en": "Temperature (°C)",
+            "fr": "Température (°C)",
+            "de": "Temperatur (°C)",
+            "es": "Temperatura (°C)"
+          },
+          "description": {
+            "en": "15 to 25 °C. Empty: the preconditioning temperature of the vehicle in Gladys.",
+            "fr": "15 à 25 °C. Vide : la température de préconditionnement du véhicule dans Gladys.",
+            "de": "15 bis 25 °C. Leer: die Vorklimatisierungstemperatur des Fahrzeugs in Gladys.",
+            "es": "De 15 a 25 °C. Vacío: la temperatura de preacondicionamiento del vehículo en Gladys."
+          },
+          "placeholder": {
+            "en": "e.g. 21",
+            "fr": "ex. 21",
+            "de": "z. B. 21",
+            "es": "p. ej. 21"
+          },
+          "required": false,
+          "min": 15,
+          "max": 25
+        }
+      ],
+      "outputs": [
+        {
+          "key": "temperature",
+          "type": "number",
+          "label": {
+            "en": "Temperature sent (°C)",
+            "fr": "Température envoyée (°C)",
+            "de": "Gesendete Temperatur (°C)",
+            "es": "Temperatura enviada (°C)"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "vehicle",
+      "label": {
+        "en": "Renault / Dacia car",
+        "fr": "Ma Renault / Dacia",
+        "de": "Renault / Dacia",
+        "es": "Mi Renault / Dacia"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "Battery, range, charging and preconditioning, with buttons to act on the car.",
+        "fr": "Batterie, autonomie, charge et préconditionnement, avec des boutons pour agir.",
+        "de": "Batterie, Reichweite, Laden und Vorklimatisierung, mit Tasten zum Steuern.",
+        "es": "Batería, autonomía, carga y preacondicionamiento, con botones para actuar."
+      },
+      "icon": "battery-charging",
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Vehicle",
+            "fr": "Véhicule",
+            "de": "Fahrzeug",
+            "es": "Vehículo"
+          },
+          "required": true
+        }
+      ],
+      "action_timeout_seconds": 60
     }
   ]
 }

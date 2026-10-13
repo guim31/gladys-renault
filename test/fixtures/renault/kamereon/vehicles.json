@@ -1,0 +1,160 @@
+{
+  "accountId": "account-id-1",
+  "country": "FR",
+  "vehicleLinks": [
+    {
+      "vin": "VF1AAAAA555777999",
+      "brand": "RENAULT",
+      "status": "ACTIVE",
+      "linkType": "OWNER",
+      "vehicleDetails": {
+        "vin": "VF1AAAAA555777999",
+        "registrationNumber": "XX-001-XX",
+        "brand": {
+          "label": "RENAULT"
+        },
+        "model": {
+          "code": "X102VE",
+          "label": "ZOE",
+          "group": "971"
+        },
+        "energy": {
+          "code": "ELEC"
+        },
+        "engineEnergyType": "ELEC"
+      }
+    },
+    {
+      "vin": "VF1AAAA0000000000",
+      "brand": "RENAULT",
+      "status": "ACTIVE",
+      "linkType": "OWNER",
+      "vehicleDetails": {
+        "vin": "VF1AAAA0000000000",
+        "registrationNumber": "XX-002-XX",
+        "brand": {
+          "label": "RENAULT"
+        },
+        "model": {
+          "code": "R5E1VE",
+          "label": "RENAULT 5",
+          "group": "971"
+        },
+        "energy": {
+          "code": "ELECX"
+        },
+        "engineEnergyType": "ELEC"
+      }
+    },
+    {
+      "vin": "UU1AAAA555777999",
+      "brand": "DACIA",
+      "status": "ACTIVE",
+      "linkType": "OWNER",
+      "vehicleDetails": {
+        "vin": "UU1AAAA555777999",
+        "registrationNumber": "XX-003-XX",
+        "brand": {
+          "label": "DACIA"
+        },
+        "model": {
+          "code": "XBG1VE",
+          "label": "SPRING",
+          "group": "971"
+        },
+        "energy": {
+          "code": "ELEC"
+        },
+        "engineEnergyType": "ELEC"
+      }
+    },
+    {
+      "vin": "VF1AAAAA555777123",
+      "brand": "RENAULT",
+      "status": "ACTIVE",
+      "linkType": "OWNER",
+      "vehicleDetails": {
+        "vin": "VF1AAAAA555777123",
+        "registrationNumber": "XX-004-XX",
+        "brand": {
+          "label": "RENAULT"
+        },
+        "model": {
+          "code": "XJB1SU",
+          "label": "CAPTUR II",
+          "group": "971"
+        },
+        "energy": {
+          "code": "ESS"
+        },
+        "engineEnergyType": "PHEV"
+      }
+    },
+    {
+      "vin": "VF1AAAAA555777888",
+      "brand": "RENAULT",
+      "status": "ACTIVE",
+      "linkType": "OWNER",
+      "vehicleDetails": {
+        "vin": "VF1AAAAA555777888",
+        "registrationNumber": null,
+        "brand": {
+          "label": "RENAULT"
+        },
+        "model": {
+          "code": "X101VE",
+          "label": "ZOE",
+          "group": "971"
+        },
+        "energy": {
+          "code": "ELEC"
+        },
+        "engineEnergyType": "ELEC"
+      }
+    },
+    {
+      "vin": "VF1AAAAA555779876",
+      "brand": "RENAULT",
+      "status": "ACTIVE",
+      "linkType": "OWNER",
+      "vehicleDetails": {
+        "vin": "VF1AAAAA555779876",
+        "registrationNumber": "XX-006-XX",
+        "brand": {
+          "label": "RENAULT"
+        },
+        "model": {
+          "code": "XHN1SU",
+          "label": "AUSTRAL",
+          "group": "971"
+        },
+        "energy": {
+          "code": "GASLN"
+        },
+        "engineEnergyType": "HEV"
+      }
+    },
+    {
+      "vin": "VF1AAAAA555777456",
+      "brand": "RENAULT",
+      "status": "ACTIVE",
+      "linkType": "OWNER",
+      "vehicleDetails": {
+        "vin": "VF1AAAAA555777456",
+        "registrationNumber": "XX-007-XX",
+        "brand": {
+          "label": "RENAULT"
+        },
+        "model": {
+          "code": "XJB2SU",
+          "label": "CAPTUR II",
+          "group": "971"
+        },
+        "energy": {
+          "code": "ESS"
+        },
+        "engineEnergyType": "OTHER"
+      }
+    }
+  ]
+}

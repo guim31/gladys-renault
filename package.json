@@ -1,6 +1,6 @@
 {
   "name": "gladys-renault",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Gladys Assistant integration for Renault and Dacia electric and plug-in hybrid cars (MY Renault / MY Dacia cloud).",
   "type": "module",

@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-13
+
 ### Added
 
 - Renault and Dacia cars of a MY Renault / MY Dacia account in Gladys, one device per car: battery
@@ -27,4 +29,5 @@ the notes of the version's GitHub Release.
 - Dashboard widget "Renault / Dacia car".
 - Documentation in English, French, German and Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-renault/commits/main
+[Unreleased]: https://github.com/guim31/gladys-renault/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/guim31/gladys-renault/releases/tag/v1.0.1

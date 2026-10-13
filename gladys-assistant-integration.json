@@ -54,7 +54,7 @@
       "description": {
         "en": "The country and language of your MY Renault / MY Dacia app: they decide the servers of the account.",
         "fr": "Le pays et la langue de votre application MY Renault / MY Dacia : ils déterminent les serveurs du compte.",
-        "de": "Land und Sprache deiner MY-Renault-/MY-Dacia-App: Sie bestimmen die Server des Kontos.",
+        "de": "Land und Sprache deiner MY-Renault-/MY-Dacia-App: Davon hängen die Server des Kontos ab.",
         "es": "El país y el idioma de su aplicación MY Renault / MY Dacia: determinan los servidores de la cuenta."
       },
       "required": true,

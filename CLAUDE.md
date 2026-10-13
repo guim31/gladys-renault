@@ -16,12 +16,12 @@ its only runtime dependency. It started from the official JavaScript template.
 ```bash
 npm install
 npm test                                  # node --test, the built-in runner
-node --test test/devices.test.js          # one file
-node --test --test-name-pattern "plug"    # tests whose name matches
+node --test test/runtime.test.js          # one file
+node --test --test-name-pattern "charge"  # tests whose name matches
 npm run lint                              # ESLint
 npm run format:check                      # Prettier, as the CI runs it
 npm run format                            # Prettier, fix in place
-npx github:GladysAssistant/integration-store .   # store admission checks
+npx -y github:GladysAssistant/integration-store --skip-image-check .   # store checks
 ```
 
 The CI (`.github/workflows/ci.yml`) runs `format:check`, `lint` and `test` on
@@ -31,16 +31,25 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only (src/app.js registers the handlers)
+src/app.js                        handlers of the Gladys client, shared with the tests
+src/renault.js                    runtime: timer, reads, publication, commands, trigger, 2FA
+src/renault/client.js             cloud client: Gigya session + Kamereon calls and commands
+src/renault/gigya.js              sign-in, JWT, two-step verification (e-mailed code)
+src/renault/endpoints.js          per-model endpoint table (generated from renault-api)
+src/renault/locales.js            locale → Gigya / Kamereon servers and keys
+src/renault/http.js, errors.js    fetch wrapper; cloud error codes → error kinds
+src/devices/vehicle.js            endpoint answers → snapshot, Gladys device, states, commands
+src/store.js                      /data/renault.json: session + per-car memory (0600, atomic)
+src/messages.js, src/i18n.js      user texts (4 languages), feature names
+src/scenes.js                     scene actions refresh_vehicle, start_preconditioning
+src/widgets.js                    dashboard widget `vehicle`
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+scripts/probe.mjs                 sign-in probe against the real cloud (nothing sensitive printed)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (same sections)
+test/                             node --test; SDK fake Gladys + test/helpers/fakeRenault.js
+test/fixtures/renault/            cloud answers from renault-api's tests (MIT), anonymized
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +79,15 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** comes in four languages (`en`, `fr`, `de` with "du",
+  `es` with "usted"): action messages, widget and error texts, feature names,
+  manifest texts, and `docs/{en,fr,de,es}.md` with the same sections
+  (`test/i18n.test.js`).
+- **Logs.** Info level is for the lifecycle only (start, cars found, one line
+  per user command, a failure and its recovery). A failure that repeats is
+  logged once (warn), then at debug level until it recovers; a cloud outage is
+  one failure whatever the number of cars. Never a password, token, e-mail
+  address, full VIN, plate or position. `test/runtime.test.js` checks both.
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -155,6 +171,12 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - Un champ `secret` dans les `fields` d'une **action** est impossible à remplir, et une action
   n'applique **aucun `default`** tout en exigeant les champs `required` (422). Issues
   GladysAssistant/Gladys#3154 et #3155.
+- **Résultat d'une action : deux niveaux seulement.** Résolu = vert, levé = rouge. Lever une erreur
+  dont le `message` est un objet `{ en, fr, de, es }` (`ActionFailure` de `src/messages.js`) : le
+  cœur le relaie tel quel et le navigateur choisit la langue. Une action ne reçoit pas le formulaire
+  en cours : elle travaille sur la configuration enregistrée.
+- **Une commande d'appareil refusée** (`onSetValue` qui lève) ne finit que dans les journaux du cœur ;
+  republier la valeur connue pour défaire l'affichage optimiste, et montrer la raison dans le widget.
 
 **SDK 0.15 et journaux**
 
@@ -197,6 +219,52 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - Les filtres de scène ne font qu'égalité et appartenance : un seuil reste le travail d'un capteur.
 - **Les clés de widgets, de déclencheurs et d'actions sont figées une fois publiées.**
 - `gladys_version` `>=5.1.0` dès qu'il y a widgets, déclencheurs ou actions de scène.
+
+## Renault / Dacia (MY Renault cloud)
+
+- Protocole repris de `hacf-fr/renault-api` (MIT, crédité dans le README et
+  `test/fixtures/renault/README.md`) : clés Gigya/Kamereon par locale, table des points d'accès par
+  modèle (`src/renault/endpoints.js`, **générée** depuis `kamereon/models.py` : la régénérer plutôt que
+  la retoucher à la main quand la bibliothèque documente un modèle). Aucune réponse réelle capturée
+  ici : le proxy des sessions de code **refuse `accounts.eu1.gigya.com`** (CONNECT 403), le test réel
+  passe par `scripts/probe.mjs` lancé ailleurs.
+- **Connexion** : Gigya `accounts.login` (formulaire) → `sessionInfo.cookieValue` = login token, gardé
+  dans `/data` avec une empreinte salée des identifiants ; `getJWT` (15 min) pour chaque appel
+  Kamereon (`apikey` + `x-gigya-id_token`, `?country=FR`). Gigya répond **HTTP 200 avec `errorCode`**
+  : 403042 mauvais mot de passe, 403101 + `regToken` vérification en deux étapes, 403005/403013 jeton
+  révoqué (on refait un login, une fois), 401020/403120 blocage temporaire. Les erreurs bloquantes
+  arrêtent toute tentative jusqu'au prochain enregistrement de la configuration.
+- **Vérification en deux étapes** (imposée à certains comptes depuis 2026, renault-api#2132) : deux
+  actions de la page de configuration (`send_verification_code`, `verify_code` avec un champ `code`
+  **string**, pas `secret` : #3154). Les identifiants `gmid`/`ucid` de `accounts.webSdkBootstrap`
+  (cookies) sont gardés : envoyés au login, Gigya ne redemande pas de code pendant ~30 jours. L'état
+  du défi (`regToken`, assertion, `phvToken`) reste en mémoire seulement.
+- **Lectures** : l'état que la voiture a envoyé au cloud, **jamais de réveil**. Budget de Home
+  Assistant : 60 appels/heure/compte (une lecture = un appel par point d'accès, 1 à 6 par voiture) :
+  la période choisie s'allonge avec le nombre de voitures (`readPeriodMs`). `err.func.wired.overloaded`
+  = pause de 15 min. Un point d'accès refusé au premier appel (403, 404, 501, « Operation not
+  supported ») est abandonné jusqu'au redémarrage, comme Home Assistant ; refusé après avoir marché,
+  c'est passager.
+- **Commandes** : le cloud répond tout de suite, la voiture exécute plus tard et rien ne dit si elle
+  l'a fait, sauf les lectures suivantes. La valeur demandée est tenue 10 min au plus (lectures de suivi
+  à +2 et +6 min) ; une lecture **datée d'après la commande** qui la contredit, ou la fin du délai,
+  remet l'état réel et le widget affiche « Pas signalée par la voiture ».
+- Modèles KCM (R5, R4, Scenic, Megane, Master E-Tech, A290) : lancer la charge = relire
+  `ev/settings`, mettre `programActivationStatus: false` partout et le renvoyer (ce que fait l'app) ;
+  pas d'arrêt de charge à distance. Spring et Zoe 2 : `charge/pause-resume`. Mode de charge : l'action
+  prend `always_charging` / `schedule_mode`, la lecture rend `always`/`scheduled` (Zoe 2, via
+  `charging-settings`) ou `always_charging`/`schedule_mode` (Zoe 1, `charge-mode`).
+- La Zoe phase 1 (X101VE) donne la puissance de charge en **watts**, les autres en kW.
+- Pas de type Gladys pour une position : `text/text` « lat, lon » (désactivée par défaut, jamais lue
+  sinon). Une « distance au domicile » demanderait `location: true` (accès aux coordonnées des
+  maisons, affiché à l'installation) : écarté.
+- **Gladys 5.2.1 sait régler une fonctionnalité `text/select` depuis une scène** (« Contrôler un
+  appareil », `DeviceSetValue.jsx`) : pas d'action de scène pour le mode de charge, ce serait un
+  doublon.
+- Le garde-fou du tutoiement allemand attrape aussi « Sie » pronom (elle, ils) : reformuler (« Davon
+  hängen … ab »), ne pas assouplir le test.
+- `publishChangedStates({ heartbeat })` du SDK compte le temps avec `Date.now()`, pas avec l'horloge
+  injectée : `t.mock.timers.enable({ apis: ['Date'] })` dans le test du heartbeat.
 
 ## Store
 

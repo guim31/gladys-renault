@@ -91,12 +91,6 @@ export const MESSAGES = {
     de: 'Zustand erneut aus der Renault-Cloud gelesen (das Auto selbst wird nicht geweckt).',
     es: 'Estado leído de nuevo desde la nube de Renault (el coche en sí no se despierta).',
   },
-  setpointSaved: {
-    en: 'Temperature saved: it is sent with the next preconditioning.',
-    fr: 'Température enregistrée : elle sera envoyée avec le prochain préconditionnement.',
-    de: 'Temperatur gespeichert: Sie wird mit der nächsten Vorklimatisierung gesendet.',
-    es: 'Temperatura guardada: se enviará con el próximo preacondicionamiento.',
-  },
   notSaved: {
     en: 'No account is saved yet: enter the e-mail address and password, save, then try again.',
     fr: 'Aucun compte n’est encore enregistré : saisissez l’adresse e-mail et le mot de passe, enregistrez, puis réessayez.',

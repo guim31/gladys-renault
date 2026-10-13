@@ -30,6 +30,20 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+What the integration handles:
+
+- the e-mail address and password of the MY Renault / MY Dacia account, kept in the Gladys
+  configuration and sent only to the Renault sign-in service (Gigya, over HTTPS);
+- in the `/data` volume, file `renault.json` (mode 0600, written atomically): the Gigya login token
+  and person id, the device identifiers Gigya remembers after a two-step verification, a salted
+  SHA-256 fingerprint of the credentials (never the password itself), and per car the
+  preconditioning temperature and the optional values it reports;
+- network: outbound HTTPS to the Renault cloud only (`accounts.*.gigya.com` or
+  `gigya-prod-au1.renaultgroup.com`, `api-wired-prod-1-*.wrd-aws.com`); nothing listens.
+
+The logs never contain the password, the e-mail address, a token, a full VIN, a plate or a position.
+A report that one of them leaks is in scope.
+
 Out of scope: Gladys Assistant itself (see its
-[security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+[security policy](https://github.com/GladysAssistant/Gladys/security/policy)), the Renault cloud and
+the cars.

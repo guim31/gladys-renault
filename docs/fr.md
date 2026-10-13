@@ -1,67 +1,187 @@
-# Template de démonstration
+# Renault / Dacia
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Suivez vos voitures électriques et hybrides rechargeables Renault et Dacia dans Gladys : batterie,
+autonomie, charge, préconditionnement, kilométrage, et la position si vous le souhaitez.
+L'intégration utilise le cloud des applications **MY Renault** / **MY Dacia**, comme l'application
+officielle et l'intégration Home Assistant.
 
-## Ce que vous obtenez
+Sans lien avec Renault ou Dacia. Développée sans le matériel : vos retours sont les bienvenus.
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+## Prérequis
+
+- Gladys 5.1.0 ou plus récent.
+- Une voiture liée à un compte **MY Renault** ou **MY Dacia**, visible dans l'application
+  officielle, avec ses services connectés actifs : Zoe, Megane E-Tech, Scenic E-Tech, Renault 5,
+  Renault 4, Twingo Electric, Master E-Tech, Dacia Spring, Captur et Megane hybrides
+  rechargeables… Les voitures hybrides et essence du compte apparaissent aussi, avec ce que le cloud
+  donne pour elles (kilométrage, autonomie carburant).
+- L'adresse e-mail et le mot de passe du compte.
 
 ## Configuration
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+Dans Gladys, **Intégrations → Renault / Dacia → Configuration** :
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+| Champ                       | Quoi saisir                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Pays du compte              | Le pays et la langue de votre application (ex. « France — Français »). Ils déterminent les serveurs du compte.                             |
+| Adresse e-mail              | L'adresse e-mail du compte.                                                                                                                |
+| Mot de passe                | Son mot de passe. Il sert uniquement à se connecter : la session ouverte est ensuite conservée dans le stockage de l'intégration.          |
+| Compte (facultatif)         | Vide : les voitures de tous les comptes de la personne. Pour n'en garder qu'un, saisissez l'identifiant donné par « Tester la connexion ». |
+| Langue des noms d'appareils | La langue des noms de fonctionnalités (français par défaut). Gladys garde un nom une fois l'appareil créé.                                 |
+| Relevé                      | Fréquence de lecture du cloud : toutes les 10, 15 (par défaut), 30 ou 60 minutes.                                                          |
+| Position GPS                | Désactivée par défaut. Activée : la dernière position envoyée par la voiture est lue et affichée.                                          |
 
-## Actions
+Enregistrez, puis cliquez sur **Tester la connexion** : le résultat liste les voitures du compte,
+ou dit en rouge ce qui ne va pas. Ouvrez ensuite l'onglet **Découverte** et ajoutez vos voitures.
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+## Vérification en deux étapes
 
-## Scènes
+Certains comptes demandent un code envoyé par e-mail à chaque nouvelle connexion. La page de
+configuration affiche alors « Votre compte demande un code envoyé par e-mail » :
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+1. cliquez sur **Envoyer le code de vérification** : le résultat indique l'adresse (masquée) à
+   laquelle il est parti ;
+2. dans les minutes qui suivent, cliquez sur **Saisir le code** et tapez le code de l'e-mail.
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+L'installation est ensuite reconnue par le compte pendant 30 jours environ, et la session est
+conservée : aucun code n'est demandé à chaque redémarrage. Un code faux peut être saisi à nouveau ;
+un code trop ancien demande un nouvel **Envoyer le code de vérification**.
 
-## Tableau de bord
+## Appareils
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+Un appareil par voiture, nommé d'après le modèle et l'immatriculation (ex. « Renault Zoe
+(AB-123-CD) »). Chaque voiture reçoit les fonctionnalités que son modèle propose :
+
+| Fonctionnalité                          | Signification                                                                                                              |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Niveau de batterie                      | État de charge, en %.                                                                                                      |
+| Autonomie                               | Autonomie électrique estimée par la voiture, en km.                                                                        |
+| État de la charge                       | En charge, branchée, en attente de la borne, débranchée (états de borne de recharge de Gladys).                            |
+| Branchée                                | 1 quand un câble est branché.                                                                                              |
+| Charge                                  | 1 pendant la charge. Une commande sur les modèles dont l'application peut lancer la charge (et l'arrêter sur certains).    |
+| Puissance de charge                     | En kW, pendant la charge (modèles qui la donnent).                                                                         |
+| Temps de charge restant                 | En minutes, pendant la charge (modèles qui le donnent).                                                                    |
+| Température de la batterie              | En °C (modèles qui la donnent).                                                                                            |
+| Mode de charge                          | Charge immédiate ou programmée, une commande (modèles qui le proposent, ex. Zoe, Captur et Megane hybrides rechargeables). |
+| Préconditionnement                      | 1 pendant que la voiture chauffe ou rafraîchit l'habitacle. Une commande : marche le lance, arrêt l'arrête.                |
+| Température de préconditionnement       | La température envoyée avec le prochain préconditionnement (15 à 25 °C, 21 °C par défaut), conservée par l'intégration.    |
+| Température extérieure / intérieure     | En °C (modèles qui la donnent).                                                                                            |
+| Kilométrage                             | En km.                                                                                                                     |
+| Autonomie carburant                     | En km (hybrides).                                                                                                          |
+| Verrouillée / portière ou coffre ouvert | Les rares modèles qui donnent leurs serrures (pas de verrouillage à distance : le cloud ne le propose pas).                |
+| Position GPS                            | « latitude, longitude », seulement quand la position GPS est activée.                                                      |
+
+**Une commande acceptée par le cloud n'est pas une commande exécutée par la voiture.** La voiture
+l'exécute de son côté, souvent une ou deux minutes plus tard. L'intégration garde la valeur demandée
+dix minutes au plus, relit la voiture deux et six minutes après la commande, puis publie ce que la
+voiture indique. Si la voiture ne l'indique jamais, l'état réel revient et le widget affiche « Pas
+signalée par la voiture ».
+
+Lancer une charge sur la Renault 5, la Renault 4, les Scenic, Megane et Master E-Tech et l'Alpine
+A290 désactive les programmes de charge, comme le fait l'application officielle : réactivez-les dans
+l'application si vous les utilisez. Ces modèles ne peuvent pas arrêter une charge à distance :
+arrêtez-la depuis la borne ou la voiture.
+
+## Widget
+
+**Ma Renault / Dacia** (choisissez le véhicule dans ses réglages) : batterie et autonomie, une liste
+d'états (charge, mode de charge, préconditionnement, serrures, dernier relevé) et jusqu'à quatre
+boutons, libellés selon ce que fait un appui maintenant : préconditionner (demande confirmation) ou
+l'arrêter, lancer ou arrêter la charge, charger maintenant ou revenir à la charge programmée,
+actualiser. Une commande affiche « Demandé, en attente de la voiture » jusqu'à ce que la voiture
+l'indique.
+
+## Déclencheur de scène
+
+**Charge terminée** : la voiture a cessé de charger en restant branchée (charge complète, ou arrêtée
+par la voiture ou la borne). Filtre facultatif : le véhicule. Variables : niveau de batterie (%) et
+autonomie (km). Une charge arrêtée depuis Gladys ne le déclenche pas.
+
+Branchée, débranchée, batterie sous un seuil : utilisez les fonctionnalités de l'appareil dans un
+déclencheur « changement d'état d'un appareil », elles le font déjà.
+
+## Actions de scène
+
+- **Actualiser une Renault / Dacia** : lit maintenant l'état que la voiture a envoyé au cloud (sans
+  la réveiller), et donne le niveau de batterie, l'autonomie, branchée et en charge aux actions
+  suivantes.
+- **Préconditionner une Renault / Dacia** : lance le préconditionnement à la température de l'action
+  (15 à 25 °C ; vide : la température de préconditionnement du véhicule). Sortie : la température
+  envoyée.
+
+La charge (Charge) et le mode de charge sont des fonctionnalités de l'appareil : une scène les règle
+avec « Contrôler un appareil ».
+
+## Exemples de scènes
+
+- **Voiture tiède à 7 h 30 en semaine** : à 7 h 15, du lundi au vendredi, « Préconditionner une
+  Renault / Dacia » à 21 °C.
+- **Charger en heures creuses** : à 22 h, si Branchée vaut 1, mettre le Mode de charge sur Immédiate ;
+  à 6 h, le remettre sur Programmée. Ou avec une condition Tempo : Programmée les jours rouges.
+- **Penser à brancher** : à 20 h, « Actualiser une Renault / Dacia », puis si la sortie niveau de
+  batterie est sous 30 et branchée est faux, envoyer le message « Pense à brancher la voiture ».
+- **Charge terminée** : envoyer le message « La Zoe est chargée
+  ({{triggerEvent.data.battery_level}} %) ».
+
+## Relevés et quota du cloud
+
+L'intégration lit le cloud avec son propre minuteur (elle ne dépend pas de l'interrogation par
+Gladys). Chaque lecture renvoie l'état que la voiture a envoyé en dernier au cloud : elle **ne
+réveille jamais la voiture**. Une voiture envoie son état quand on l'éteint, pendant la charge et
+après une commande ; garée et endormie, elle peut rester des heures sans nouvelles, quel que soit le
+relevé choisi.
+
+Une lecture coûte un appel par point d'accès que la voiture propose (batterie, kilométrage,
+climatisation, mode de charge, serrures, position : 1 à 6). Comme Home Assistant, l'intégration reste
+sous **60 appels par heure et par compte** : avec plusieurs voitures, les lectures s'espacent au-delà
+du relevé choisi s'il le faut. Quand le cloud répond « quota atteint », les lectures s'arrêtent 15
+minutes. Une valeur qui ne change pas est renvoyée à Gladys toutes les 12 heures, pour ne jamais
+paraître périmée.
+
+## Vie privée et données conservées
+
+- Le mot de passe reste dans la configuration de Gladys ; il sert uniquement à se connecter.
+- La session (jeton de connexion, identifiant du compte, identifiants de cette installation après
+  une vérification en deux étapes) et les températures de préconditionnement sont conservées dans le
+  volume `/data` de l'intégration, fichier lisible par l'intégration seule. Rien de tout cela, ni
+  l'adresse e-mail, n'apparaît dans les journaux.
+- La position GPS est désactivée par défaut ; désactivée, elle n'est jamais lue.
+- L'intégration ne parle qu'au cloud Renault (Gigya pour la connexion, Kamereon pour les voitures).
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« Le compte a refusé la connexion »** : vérifiez le pays, l'adresse e-mail et le mot de passe
+  (ceux de l'application), puis enregistrez. L'intégration ne réessaie pas d'elle-même, pour ne pas
+  bloquer le compte.
+- **« Votre compte demande un code envoyé par e-mail »** : voir Vérification en deux étapes.
+- **« Le service de connexion refuse pour le moment »** : trop de tentatives ; patientez quelques
+  heures, puis enregistrez à nouveau.
+- **Une voiture manque** : vérifiez qu'elle apparaît dans l'application officielle avec le même
+  compte et le même pays ; avec plusieurs comptes, videz le champ Compte.
+- **Une fonctionnalité manque** : le modèle ne la propose pas, ou n'a jamais envoyé la valeur. Le
+  cloud répond « interdit » ou « introuvable » pour ce qu'un modèle n'a pas ; ce point d'accès n'est
+  alors plus lu.
+- **« Le mode confidentialité de la voiture est activé »** : désactivez-le dans la voiture.
+- **Valeurs anciennes** : la voiture n'a pas envoyé son état depuis (endormie, pas de réseau là où
+  elle est garée). La ligne « Dernier relevé » du widget donne la date du dernier état.
+- Plus de détails : mettez `LOG_LEVEL=debug` sur le conteneur.
+
+## Limites
+
+- Développée sans voiture ni compte, à partir du protocole et des vraies réponses rassemblées par
+  `renault-api` : vos retours sont les bienvenus sur le forum ou dans les issues.
+- Pas de verrouillage, de klaxon ni d'appel de phares à distance : le cloud ne propose pas le
+  verrouillage, et klaxon et phares ont été laissés de côté (un bouton de tableau de bord s'appuie
+  vite par erreur).
+- Pas de modification des programmes de charge, pas de limite de charge, pas d'historique des
+  charges.
+- Les commandes passent par le cloud Renault : quand il est en panne, rien ne marche, et il peut
+  changer sans prévenir.
+- La position est publiée en texte ; pas de distance au domicile.
+
+## Crédits
+
+Le protocole, la table des points d'accès par modèle et les fixtures de test viennent de
+[hacf-fr/renault-api](https://github.com/hacf-fr/renault-api) (MIT), la bibliothèque de
+l'intégration Home Assistant `renault`, dont le comportement (quota, points d'accès refusés selon le
+modèle) a été suivi.

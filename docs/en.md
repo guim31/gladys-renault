@@ -1,61 +1,171 @@
-# Demo Devices Template
+# Renault / Dacia
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+Follow your Renault and Dacia electric and plug-in hybrid cars in Gladys: battery, range, charging,
+preconditioning, mileage, and the position if you want it. The integration uses the cloud of the
+**MY Renault** / **MY Dacia** apps, like the official app and the Home Assistant integration.
 
-## What you get
+Not affiliated with Renault or Dacia. Developed without the hardware: feedback welcome.
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+## Requirements
+
+- Gladys 5.1.0 or later.
+- A car linked to a **MY Renault** or **MY Dacia** account, visible in the official app, with its
+  connected services active: Zoe, Megane E-Tech, Scenic E-Tech, Renault 5, Renault 4, Twingo
+  Electric, Master E-Tech, Dacia Spring, Captur and Megane plug-in hybrids… Hybrid and petrol cars
+  of the account also appear, with what the cloud gives for them (mileage, fuel range).
+- The e-mail address and password of the account.
 
 ## Configuration
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+In Gladys, **Integrations → Renault / Dacia → Configuration**:
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+| Field                  | What to enter                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Country of the account | The country and language of your app (e.g. "France — Français"). It decides the servers of the account.           |
+| E-mail address         | The e-mail address of the account.                                                                                |
+| Password               | Its password. It is used to sign in only: the session it opens is then kept in the integration's storage.         |
+| Account (optional)     | Empty: the cars of every account of the person. To keep one account, enter the id shown by "Test the connection". |
+| Device names language  | The language of the feature names (French by default). Gladys keeps a name once the device is created.            |
+| Refresh                | How often the cloud is read: every 10, 15 (default), 30 or 60 minutes.                                            |
+| GPS position           | Off by default. On: the last position the car sent is read and shown.                                             |
 
-## Actions
+Save, then click **Test the connection**: it lists the cars of the account, or says in red what is
+wrong. Then open the **Discovery** tab and add your cars.
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+## Two-step verification
 
-## Scenes
+Some accounts ask for a code sent by e-mail at each new sign-in. The configuration page then shows
+"Your account asks for a code sent by e-mail":
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+1. click **Send the verification code**: the result shows the (masked) address it was sent to;
+2. within a few minutes, click **Enter the code** and type the code of the e-mail.
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+The installation is then remembered by the account for about 30 days, and the session is kept: no
+code is asked at each restart. A wrong code can be typed again; an old one needs a new
+**Send the verification code**.
 
-## Dashboard
+## Devices
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+One device per car, named after the model and the plate (e.g. "Renault Zoe (AB-123-CD)"). Each car
+gets the features its model offers:
+
+| Feature                        | Meaning                                                                                                         |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Battery level                  | State of charge, in %.                                                                                          |
+| Range                          | Electric range estimated by the car, in km.                                                                     |
+| Charging state                 | Charging, plugged in, waiting for the charger, unplugged (Gladys charging station states).                      |
+| Plugged in                     | 1 when a cable is connected.                                                                                    |
+| Charging                       | 1 while the car charges. A command on the models whose app can start the charge (and stop it on some).          |
+| Charging power                 | In kW, while charging (models that report it).                                                                  |
+| Charging time remaining        | In minutes, while charging (models that report it).                                                             |
+| Battery temperature            | In °C (models that report it).                                                                                  |
+| Charge mode                    | Immediate or scheduled charging, a command (models that offer it, e.g. Zoe, Captur and Megane plug-in hybrids). |
+| Preconditioning                | 1 while the car heats or cools its cabin. A command: on starts it, off stops it.                                |
+| Preconditioning temperature    | The temperature sent with the next preconditioning (15 to 25 °C, 21 °C by default), kept by the integration.    |
+| Outside / inside temperature   | In °C (models that report it).                                                                                  |
+| Mileage                        | In km.                                                                                                          |
+| Fuel range                     | In km (hybrids).                                                                                                |
+| Locked / door or tailgate open | The few models that report their locks (no remote locking: the cloud does not offer it).                        |
+| GPS position                   | "latitude, longitude", only when the GPS position is on.                                                        |
+
+**A command accepted by the cloud is not a command carried out by the car.** The car does it on its
+own, often a minute or two later. The integration holds the requested value for up to ten minutes,
+reads the car again two and six minutes after the command, and then publishes what the car reports.
+When the car never reports it, the real state comes back and the widget says "Not reported by the
+car".
+
+Starting a charge on the Renault 5, Renault 4, Scenic E-Tech, Megane E-Tech, Master E-Tech and Alpine
+A290 turns the charge programs off, as the official app does: switch them on again in the app if you
+use them. These models cannot stop a charge remotely: stop it from the charger or the car.
+
+## Widget
+
+**Renault / Dacia car** (choose the vehicle in its settings): battery and range, a status list
+(charge, charge mode, preconditioning, locks, last update) and up to four buttons, labelled with what
+a tap does now: precondition (asks for confirmation) or stop it, start or stop charging, charge now or
+use the schedule, refresh. A command shows "Requested, waiting for the car" until the car reports it.
+
+## Scene trigger
+
+**Charge finished**: the car stopped charging while still plugged in (charge complete, or stopped by
+the car or the charger). Optional filter: the vehicle. Variables: battery level (%) and range (km). A
+charge stopped from Gladys does not fire it.
+
+Plugged in, unplugged, battery under a threshold: use the device features in a "device state"
+trigger, they already do it.
+
+## Scene actions
+
+- **Refresh a Renault / Dacia**: reads the state the car last sent to the cloud now (it does not wake
+  the car), and gives the battery level, the range, plugged in and charging to the next actions.
+- **Precondition a Renault / Dacia**: starts the preconditioning at the temperature of the action (15
+  to 25 °C; empty: the preconditioning temperature of the vehicle). Output: the temperature sent.
+
+The charge (Charging) and the charge mode are device features: a scene sets them with "Control a
+device".
+
+## Scene examples
+
+- **Warm car at 7:30 on weekdays**: at 7:15, Monday to Friday, "Precondition a Renault / Dacia" at
+  21 °C.
+- **Charge during off-peak hours**: at 22:00, if Plugged in is 1, set Charge mode to Immediate; at
+  6:00, set it back to Scheduled. Or with a Tempo/EDF condition: Scheduled on red days.
+- **Reminder to plug in**: at 20:00, "Refresh a Renault / Dacia", then if the battery level output is
+  under 30 and plugged in is false, send a message "Remember to plug the car in".
+- **Charge finished**: send a message "The Zoe is charged ({{triggerEvent.data.battery_level}} %)".
+
+## Refresh and cloud quota
+
+The integration reads the cloud on its own timer (it does not rely on Gladys polling). Each read
+returns the state the car last sent to the cloud: it **never wakes the car**. A car sends its state
+when it is switched off, while it charges and after a command; parked and asleep, it may stay hours
+without news, whatever the refresh chosen.
+
+A read costs one call per endpoint the car offers (battery, mileage, climate, charge mode, locks,
+position: 1 to 6). Like Home Assistant, the integration stays under **60 calls an hour per account**:
+with several cars, the reads are spaced out beyond the chosen refresh if needed. When the cloud
+answers "quota reached", the reads pause for 15 minutes. A value that does not change is sent to
+Gladys again every 12 hours, so it never shows as stale.
+
+## Privacy and stored data
+
+- The password stays in the Gladys configuration; it is used to sign in only.
+- The session (sign-in token, account id, the identifiers of this installation after a two-step
+  verification) and the preconditioning temperatures are stored in the integration's `/data` volume,
+  file readable by the integration only. None of it, nor the e-mail address, ever appears in the logs.
+- The GPS position is off by default; when off, it is never read.
+- The integration talks to the Renault cloud only (Gigya for the sign-in, Kamereon for the cars).
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"The account refused the sign-in"**: check the country, the e-mail address and the password (the
+  ones of the app), then save. The integration does not try again on its own, to avoid locking the
+  account.
+- **"Your account asks for a code sent by e-mail"**: see Two-step verification.
+- **"The sign-in service refuses the connection for now"**: too many attempts; wait a few hours, then
+  save again.
+- **A car is missing**: check that it appears in the official app with the same account and
+  country; with several accounts, empty the Account field.
+- **A feature is missing**: the model does not offer it, or never sent the value. The cloud answers
+  "forbidden" or "not found" for what a model lacks; such an endpoint is no longer read.
+- **"The privacy mode of the car is on"**: switch it off in the car.
+- **Old values**: the car has not sent its state since (asleep, no network where it is parked). The
+  "Last update" row of the widget gives the date of the last state.
+- More details: set `LOG_LEVEL=debug` on the container.
+
+## Limits
+
+- Developed without a car or an account, from the protocol and the real answers collected by
+  `renault-api`: feedback welcome on the forum or in the issues.
+- No remote lock, horn or lights: the cloud does not offer locking, and horn and lights were left out
+  (a dashboard button is easy to press by mistake).
+- No charge schedule editing, no charge limit, no charge history.
+- The commands go through the Renault cloud: when it is down, nothing works, and it may change
+  without notice.
+- The position is published as text; no distance from home.
+
+## Credits
+
+The protocol, the per-model endpoint table and the test fixtures come from
+[hacf-fr/renault-api](https://github.com/hacf-fr/renault-api) (MIT), the library of the Home
+Assistant `renault` integration, whose behaviour (quota, endpoints refused per model) was followed.

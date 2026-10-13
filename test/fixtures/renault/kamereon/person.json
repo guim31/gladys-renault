@@ -1,0 +1,23 @@
+{
+  "personId": "person-id-1",
+  "country": "FR",
+  "accounts": [
+    {
+      "accountId": "account-id-1",
+      "accountType": "MYRENAULT",
+      "accountStatus": "ACTIVE",
+      "country": "FR",
+      "personId": "person-id-1",
+      "relationType": "OWNER"
+    },
+    {
+      "accountId": "account-id-2",
+      "externalId": "externalId",
+      "accountType": "SFDC",
+      "accountStatus": "ACTIVE",
+      "country": "FR",
+      "personId": "person-id-1",
+      "relationType": "OWNER"
+    }
+  ]
+}

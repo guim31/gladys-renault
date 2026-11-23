@@ -168,3 +168,35 @@ test('an incomplete account 2 is ignored, with one warning', async () => {
   assert.deepEqual(world.fake.connectionStatus, { connected: true });
   assert.equal(world.logger.lines.warn.filter((l) => l.includes('Account 2 ignored')).length, 1);
 });
+
+test('an empty account 1 next to a filled account 2: no red status from account 1', async () => {
+  const { options } = twoAccounts();
+  const world = await createWorld({
+    ...options,
+    config: { ...options.config, username: '', password: '' },
+  });
+  assert.ok(deviceIds(world).includes(`ext:renault:vehicle:${VINS.AUSTRAL}`));
+  assert.deepEqual(world.fake.connectionStatus, { connected: true });
+  const ack = await world.fake.action('test_connection', {});
+  assert.equal(ack.success, true, JSON.stringify(ack));
+  assert.match(ack.data.message.fr, /^Compte 2 : Connecté/);
+});
+
+test('a blocked account: a car it shared is read through the other account', async () => {
+  const { partner, options } = twoAccounts();
+  const world = await createWorld(options);
+  assert.equal(partner.carCalls(VINS.ZOE).length, 0);
+  // Account 1's password changes: its session is revoked, the sign-in refused.
+  world.renault.password = 'changed';
+  for (const token of [world.store.data.session.loginToken]) world.renault.revokedTokens.add(token);
+  world.renault.validJwts.clear();
+  await world.tick(16 * 60 * 1000);
+  assert.equal(world.runtime.account(1).blocked, 'auth');
+  await world.tick(16 * 60 * 1000);
+  assert.ok(partner.carCalls(VINS.ZOE).length > 0, 'the shared car is read by account 2');
+  await world.createAll();
+  const ack = await world.fake.sceneAction('refresh_vehicle', {
+    device: `ext:renault:vehicle:${VINS.ZOE}`,
+  });
+  assert.equal(ack.success, true, JSON.stringify(ack));
+});

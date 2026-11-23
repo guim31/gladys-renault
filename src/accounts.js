@@ -13,7 +13,7 @@
 // -----------------------------------------------------------------------------
 
 import { createLogger } from '@gladysassistant/integration-sdk';
-import { accountConfigs } from './config.js';
+import { accountConfigs, isConfigured } from './config.js';
 import { ERROR_KINDS } from './renault/errors.js';
 import { ActionFailure } from './messages.js';
 import { createRenault } from './renault.js';
@@ -53,13 +53,46 @@ function prefixedLogger(logger, slot) {
 
 export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
   const baseLogger = runtimeOptions.logger ?? logger ?? createLogger({ name: 'renault' });
-  // slot → { runtime, devices, status }
+  const now = runtimeOptions.now ?? Date.now;
+  const timers = runtimeOptions.timers ?? true;
+  // slot → { runtime, devices, status, configured, rehomed }
   const slots = new Map();
   let statusSent = null;
 
   const entries = () => [...slots.entries()].sort(([a], [b]) => a - b);
   const runtimes = () => entries().map(([, entry]) => entry.runtime);
   const several = () => slots.size > 1;
+  // An empty account 1 next to a filled account 2 says nothing: it is left
+  // out of the status and of the connection test.
+  const active = () => {
+    const filled = entries().filter(([, entry]) => entry.configured);
+    return filled.length > 0 ? filled : entries().filter(([slot]) => slot === 1);
+  };
+
+  // The core takes one widget refresh per key every 10 s and drops the others:
+  // one limiter for every account, the last request sent at the end of the window.
+  const WIDGET_REFRESH_GAP_MS = 10 * 1000;
+  const refreshes = new Map(); // key → { at, timer }
+  function requestWidgetRefresh(key) {
+    const entry = refreshes.get(key) ?? { at: -Infinity, timer: null };
+    refreshes.set(key, entry);
+    if (entry.timer) return;
+    const fire = () => {
+      entry.timer = null;
+      entry.at = now();
+      try {
+        gladys.requestWidgetRefresh(key);
+      } catch (err) {
+        baseLogger.debug(`Widget nudge skipped: ${err.message}`);
+      }
+    };
+    const delay = entry.at + WIDGET_REFRESH_GAP_MS - now();
+    if (delay <= 0 || !timers) fire();
+    else {
+      entry.timer = setTimeout(fire, delay);
+      entry.timer.unref?.();
+    }
+  }
 
   async function publishUnion() {
     const seen = new Set();
@@ -75,7 +108,7 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
   }
 
   async function sendStatus() {
-    const known = entries().filter(([, entry]) => entry.status);
+    const known = active().filter(([, entry]) => entry.status);
     if (known.length === 0) return;
     const trouble = known.find(([, entry]) => !entry.status[0]);
     const [connected, message] = trouble
@@ -98,6 +131,7 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
             await publishUnion();
           };
         }
+        if (prop === 'requestWidgetRefresh') return requestWidgetRefresh;
         if (prop === 'setConnectionStatus') {
           return async (connected, message) => {
             const entry = slots.get(slot);
@@ -112,7 +146,7 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
   }
 
   function addSlot(slot) {
-    const entry = { runtime: null, devices: [], status: null };
+    const entry = { runtime: null, devices: [], status: null, configured: false, rehomed: false };
     slots.set(slot, entry);
     entry.runtime = createRenault({
       ...runtimeOptions,
@@ -120,8 +154,12 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
       store,
       logger: prefixedLogger(baseLogger, slot),
       slot,
+      // A blocked account (password changed, code awaited) reads nothing: it
+      // owns no car, another account listing it may read it.
       ownedElsewhere: (vin) =>
-        entries().some(([other, e]) => other !== slot && e.runtime.hasVehicle(vin)),
+        entries().some(
+          ([other, e]) => other !== slot && !e.runtime.blocked && e.runtime.hasVehicle(vin),
+        ),
     });
     return entry;
   }
@@ -144,10 +182,34 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
     }
   }
 
-  /** The runtime of the account a device belongs to (account 1 if none). */
+  /** The runtime of the account a device belongs to, a working one first (account 1 if none). */
   function runtimeOf(deviceExternalId) {
-    const owner = runtimes().find((runtime) => runtime.owns(deviceExternalId));
-    return owner ?? slots.get(1).runtime;
+    const owners = runtimes().filter((runtime) => runtime.owns(deviceExternalId));
+    return owners.find((runtime) => !runtime.blocked) ?? owners[0] ?? slots.get(1).runtime;
+  }
+
+  /**
+   * When an account gets blocked, the others list their cars again: a car it
+   * shared with them is read through them until it is unblocked.
+   */
+  async function rehome() {
+    for (const [slot, entry] of entries()) {
+      if (!entry.runtime.blocked) {
+        entry.rehomed = false;
+        continue;
+      }
+      if (entry.rehomed) continue;
+      entry.rehomed = true;
+      for (const [other, e] of entries()) {
+        if (other !== slot && e.configured && !e.runtime.blocked) await e.runtime.scan();
+      }
+    }
+  }
+
+  async function startAccount(entry, account) {
+    entry.configured = isConfigured(account);
+    entry.rehomed = false;
+    await entry.runtime.start(account);
   }
 
   /** Run an action on one account; with several accounts, say which one. */
@@ -171,9 +233,9 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
       const { accounts, skipped } = accountConfigs(config);
       warnSkipped(skipped);
       for (const account of accounts) {
-        const entry = slots.get(account.slot) ?? addSlot(account.slot);
-        await entry.runtime.start(account);
+        await startAccount(slots.get(account.slot) ?? addSlot(account.slot), account);
       }
+      await rehome();
     },
 
     async stop() {
@@ -182,6 +244,7 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
 
     async tick() {
       for (const runtime of runtimes()) await runtime.tick();
+      await rehome();
     },
 
     /** New configuration: accounts added, removed or changed. */
@@ -193,17 +256,21 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
       for (const slot of removed) await removeSlot(slot);
       for (const account of accounts) {
         const existing = slots.get(account.slot);
-        if (existing) await existing.runtime.reconfigure(account);
-        else await addSlot(account.slot).runtime.start(account);
+        if (existing) {
+          existing.configured = isConfigured(account);
+          existing.rehomed = false;
+          await existing.runtime.reconfigure(account);
+        } else await startAccount(addSlot(account.slot), account);
       }
+      // The status of an account 1 emptied or filled again.
+      await sendStatus().catch(() => {});
       // A car shared with a removed account comes back with the remaining one.
       if (removed.length > 0) for (const runtime of runtimes()) await runtime.scan();
+      await rehome();
     },
 
-    async reportStatus(connected, message) {
-      await gladys.setConnectionStatus(connected, message);
-      statusSent = null;
-    },
+    // Through account 1: its runtime then sends its next status again.
+    reportStatus: (connected, message) => slots.get(1).runtime.reportStatus(connected, message),
 
     async resync() {
       statusSent = null;
@@ -227,10 +294,10 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
 
     /** Every account is tested; one failure makes the whole test red. */
     async testConnection() {
-      if (!several()) return slots.get(1).runtime.testConnection();
+      if (active().length === 1) return onAccount(active()[0][0], (r) => r.testConnection());
       const parts = [];
       let failed = false;
-      for (const [slot, entry] of entries()) {
+      for (const [slot, entry] of active()) {
         try {
           parts.push(prefixed(slot, await entry.runtime.testConnection()));
         } catch (err) {
@@ -254,7 +321,7 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
       const waiting = entries().find(
         ([, entry]) => entry.runtime.blocked === ERROR_KINDS.TFA_REQUIRED,
       );
-      return onAccount(waiting?.[0] ?? 1, (runtime) => runtime.sendVerificationCode());
+      return onAccount(waiting?.[0] ?? active()[0][0], (runtime) => runtime.sendVerificationCode());
     },
 
     /** Checked by the account a code was sent for. */
@@ -262,7 +329,7 @@ export function createAccounts({ gladys, store, logger, ...runtimeOptions }) {
       const pending =
         entries().find(([, entry]) => entry.runtime.tfaPending) ??
         entries().find(([, entry]) => entry.runtime.blocked === ERROR_KINDS.TFA_REQUIRED);
-      return onAccount(pending?.[0] ?? 1, (runtime) => runtime.verifyCode(code));
+      return onAccount(pending?.[0] ?? active()[0][0], (runtime) => runtime.verifyCode(code));
     },
 
     get blocked() {

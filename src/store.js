@@ -21,7 +21,9 @@ import { join } from 'node:path';
 export const DEFAULT_DATA_DIR = process.env.DATA_DIR || '/data';
 const FILE_NAME = 'renault.json';
 
-const emptyData = () => ({ version: 1, salt: null, session: {}, vehicles: {} });
+// `session` is the one of account 1 (where it always was), `sessions` those of
+// accounts 2 and 3, by slot.
+const emptyData = () => ({ version: 1, salt: null, session: {}, sessions: {}, vehicles: {} });
 
 export function createStore({ dir = DEFAULT_DATA_DIR, debounceMs = 2000, logger } = {}) {
   const file = join(dir, FILE_NAME);
@@ -110,18 +112,24 @@ function createStoreApi({ get, touch, flush, load }) {
      * The session store of the cloud client, bound to the credentials it
      * belongs to: another fingerprint starts from an empty session (the
      * Gigya device ids are kept: they identify this installation, not the
-     * account).
+     * account). One session per account slot.
      */
-    sessionStore(fingerprint) {
+    sessionStore(fingerprint, slot = 1) {
       const data = get();
-      if (data.session.fingerprint !== fingerprint) {
-        data.session = { fingerprint, deviceIds: data.session.deviceIds ?? null };
+      data.sessions ??= {};
+      const read = () => (slot === 1 ? get().session : (get().sessions[slot] ?? {}));
+      const write = (session) => {
+        if (slot === 1) get().session = session;
+        else get().sessions[slot] = session;
+      };
+      if (read().fingerprint !== fingerprint) {
+        write({ fingerprint, deviceIds: read().deviceIds ?? null });
         touch();
       }
       return {
-        get: () => get().session,
+        get: read,
         set(partial) {
-          Object.assign(get().session, partial);
+          Object.assign(read(), partial);
           // A new token is saved at once: a restart must not sign in again.
           flush();
         },

@@ -27,6 +27,8 @@ real cars.
   a Renault / Dacia" (with its own temperature).
 - **Dashboard widget** "Renault / Dacia car": battery, range, charge, charge mode, preconditioning,
   last update, and buttons to act on the car.
+- **Several accounts**: up to three MY Renault / MY Dacia accounts, for households where each driver
+  keeps their own.
 - **Two-step verification**: accounts that ask for a code by e-mail are supported, through two
   buttons of the configuration page; the installation is then remembered.
 

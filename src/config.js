@@ -22,7 +22,15 @@ export const DEFAULT_CONFIG = {
   language: 'fr',
   refresh_minutes: '15',
   gps: false,
+  username_2: '',
+  password_2: '',
+  username_3: '',
+  password_3: '',
 };
+
+// Accounts 2 and 3 (optional): an e-mail address and a password each; they
+// share the country, the language, the refresh and the GPS choice of account 1.
+export const EXTRA_SLOTS = [2, 3];
 
 const choice = (value, choices, fallback) =>
   choices.includes(String(value)) ? String(value) : fallback;
@@ -47,7 +55,39 @@ export function normalizeConfig(raw = {}) {
       DEFAULT_CONFIG.refresh_minutes,
     ),
     gps: config.gps === true || config.gps === 'true',
+    ...Object.fromEntries(
+      EXTRA_SLOTS.flatMap((slot) => [
+        [`username_${slot}`, String(config[`username_${slot}`] ?? '').trim()],
+        [`password_${slot}`, String(config[`password_${slot}`] ?? '').replace(/[\r\n]+$/, '')],
+      ]),
+    ),
   };
+}
+
+/**
+ * The configuration of each account, account 1 first: the shared settings
+ * with that account's credentials. Account 1 is always there (it says "not
+ * configured" when empty); accounts 2 and 3 only when both their fields are
+ * filled, and not twice the same address. `skipped` lists the slots ignored.
+ * @param {object} config normalized config
+ */
+export function accountConfigs(config) {
+  const accounts = [{ ...config, slot: 1 }];
+  const skipped = [];
+  const used = new Set(config.username ? [config.username.toLowerCase()] : []);
+  for (const slot of EXTRA_SLOTS) {
+    const username = config[`username_${slot}`] ?? '';
+    const password = config[`password_${slot}`] ?? '';
+    if (!username && !password) continue;
+    if (!username || !password || used.has(username.toLowerCase())) {
+      skipped.push(slot);
+      continue;
+    }
+    used.add(username.toLowerCase());
+    // Only account 1 can be narrowed to one of the person's accounts.
+    accounts.push({ ...config, slot, username, password, account_id: '' });
+  }
+  return { accounts, skipped };
 }
 
 export const isConfigured = (config) => Boolean(config.username && config.password);

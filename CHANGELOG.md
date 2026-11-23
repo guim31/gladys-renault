@@ -10,6 +10,13 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- Up to three MY Renault / MY Dacia accounts in one integration ("Account 2" and "Account 3" in the
+  configuration), for households where each driver keeps their car in their own account. Each
+  account has its own session, cloud quota, errors and two-step verification; a car shared by two
+  accounts appears once. Cars already added keep their device (its id comes from the VIN).
+
 ## [1.0.1] - 2026-10-13
 
 ### Added

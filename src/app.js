@@ -4,7 +4,7 @@
 // -----------------------------------------------------------------------------
 
 import { normalizeConfig } from './config.js';
-import { createRenault } from './renault.js';
+import { createAccounts } from './accounts.js';
 import { createWidgets } from './widgets.js';
 import { createSceneActions } from './scenes.js';
 import { MESSAGES } from './messages.js';
@@ -26,7 +26,7 @@ export const ACTION_KEYS = {
  * @returns {object} the runtime
  */
 export function registerHandlers({ gladys, store, logger, runtimeOptions = {}, timeZone }) {
-  const runtime = createRenault({ gladys, store, ...runtimeOptions });
+  const runtime = createAccounts({ gladys, store, ...runtimeOptions });
   let started = false;
 
   gladys.onScanRequest(() => runtime.scan());

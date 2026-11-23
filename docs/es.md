@@ -21,18 +21,26 @@ Sin relación con Renault ni Dacia. Desarrollada sin el hardware: sus comentario
 
 En Gladys, **Integraciones → Renault / Dacia → Configuración**:
 
-| Campo                 | Qué introducir                                                                                                                     |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| País de la cuenta     | El país y el idioma de su aplicación (p. ej. «España — Español»). Determinan los servidores de la cuenta.                          |
-| Correo electrónico    | El correo de la cuenta.                                                                                                            |
-| Contraseña            | Su contraseña. Solo sirve para iniciar sesión: la sesión abierta se conserva después en el almacenamiento de la integración.       |
-| Cuenta (opcional)     | Vacío: los coches de todas las cuentas de la persona. Para usar solo una, introduzca el identificador que da «Probar la conexión». |
-| Idioma de los nombres | El idioma de los nombres de las funciones (francés por defecto). Gladys conserva un nombre una vez creado el dispositivo.          |
-| Actualización         | Frecuencia de lectura de la nube: cada 10, 15 (por defecto), 30 o 60 minutos.                                                      |
-| Posición GPS          | Desactivada por defecto. Activada: se lee y muestra la última posición enviada por el coche.                                       |
+| Campo                 | Qué introducir                                                                                                                                                          |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| País de la cuenta     | El país y el idioma de su aplicación (p. ej. «España — Español»). Determinan los servidores de la cuenta.                                                               |
+| Correo electrónico    | El correo de la cuenta.                                                                                                                                                 |
+| Contraseña            | Su contraseña. Solo sirve para iniciar sesión: la sesión abierta se conserva después en el almacenamiento de la integración.                                            |
+| Cuenta (opcional)     | Vacío: los coches de todas las cuentas de la persona. Para usar solo una, introduzca el identificador que da «Probar la conexión».                                      |
+| Cuenta 2, cuenta 3    | Opcionales: el correo y la contraseña de otras cuentas MY Renault / MY Dacia (mismo país), por ejemplo la de otro conductor del hogar. Sus coches se suman a los demás. |
+| Idioma de los nombres | El idioma de los nombres de las funciones (francés por defecto). Gladys conserva un nombre una vez creado el dispositivo.                                               |
+| Actualización         | Frecuencia de lectura de la nube: cada 10, 15 (por defecto), 30 o 60 minutos.                                                                                           |
+| Posición GPS          | Desactivada por defecto. Activada: se lee y muestra la última posición enviada por el coche.                                                                            |
 
 Guarde y pulse **Probar la conexión**: el resultado muestra los coches de la cuenta o indica en rojo
 lo que falla. Abra después la pestaña **Descubrimiento** y añada sus coches.
+
+**Varias cuentas.** Cada conductor puede mantener su coche en su propia cuenta MY Renault / MY Dacia
+(y conservar la aplicación, la posición y las notificaciones): introduzca hasta dos cuentas más en
+«Cuenta 2» y «Cuenta 3». Cada cuenta tiene su sesión, su cuota de la nube y sus errores; «Probar la
+conexión» las prueba todas. Un coche compartido por dos cuentas aparece una sola vez. El
+identificador de un dispositivo viene del VIN del coche, no de la cuenta: añadir una cuenta o pasar
+un coche a otra cuenta conserva su dispositivo, su historial y sus escenas.
 
 ## Verificación en dos pasos
 
@@ -46,6 +54,10 @@ configuración muestra entonces «Su cuenta pide un código enviado por correo»
 La cuenta reconoce después esta instalación durante unos 30 días y la sesión se conserva: no se pide
 ningún código en cada reinicio. Un código incorrecto puede introducirse de nuevo; uno demasiado
 antiguo necesita un nuevo **Enviar el código de verificación**.
+
+Con varias cuentas, **Enviar el código de verificación** se dirige a la primera cuenta que espera un
+código, e **Introducir el código** a la cuenta a la que se envió; el resultado indica la cuenta
+(«Cuenta 2: …»). Si dos cuentas esperan un código, hágalas una tras otra.
 
 ## Dispositivos
 
@@ -173,6 +185,7 @@ cada 12 horas, para que nunca parezca caducado.
 - Sin edición de los programas de carga, sin límite de carga, sin historial de cargas.
 - Los comandos pasan por la nube de Renault: si falla, nada funciona, y puede cambiar sin aviso.
 - La posición se publica como texto; sin distancia al domicilio.
+- Híbridos no enchufables (E-Tech full hybrid): la distancia recorrida en modo eléctrico, que muestra el coche, no la envía la nube MY Renault (ni renault-api ni Home Assistant la leen); solo el kilometraje total y el combustible.
 
 ## Créditos
 

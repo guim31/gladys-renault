@@ -44,6 +44,7 @@ export function recordingLogger() {
  * @param {boolean} [options.connect] connect now (default true)
  * @param {object} [options.cloud] an existing fake cloud
  * @param {string[]} [options.cars] keep only these VINs in the account
+ * @param {object} [options.others] other accounts: address → fake cloud
  */
 export async function createWorld({
   config = {},
@@ -53,6 +54,7 @@ export async function createWorld({
   connect = true,
   cloud,
   cars,
+  others = {},
   logger = recordingLogger(),
 } = {}) {
   let clock = T0;
@@ -70,6 +72,8 @@ export async function createWorld({
     config: { username: USERNAME, password: PASSWORD, locale: 'fr_FR', ...config },
   });
   const http = createHttp({ fetchImpl: renault.fetch });
+  const httpOf = (username) =>
+    others[username] ? createHttp({ fetchImpl: others[username].fetch }) : http;
   const runtime = registerHandlers({
     gladys,
     store,
@@ -81,7 +85,7 @@ export async function createWorld({
       timers: false,
       clientFactory: (cfg, session) =>
         createRenaultClient({
-          http,
+          http: httpOf(cfg.username),
           locale: cfg.locale,
           credentials: { username: cfg.username, password: cfg.password },
           session,

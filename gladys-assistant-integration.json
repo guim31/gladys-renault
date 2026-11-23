@@ -382,10 +382,124 @@
         "es": "Cuenta (opcional)"
       },
       "description": {
-        "en": "Empty: the cars of every account of the person. To keep one account, enter the id shown by “Test the connection”.",
-        "fr": "Vide : les voitures de tous les comptes de la personne. Pour n'en garder qu'un, saisissez l'identifiant donné par « Tester la connexion ».",
-        "de": "Leer: die Autos aller Konten der Person. Um nur ein Konto zu nutzen, gib die von „Verbindung testen“ angezeigte ID ein.",
-        "es": "Vacío: los coches de todas las cuentas de la persona. Para usar solo una, introduzca el identificador que da «Probar la conexión»."
+        "en": "Account 1 only. Empty: the cars of every account of the person. To keep one, enter the id shown by “Test the connection”.",
+        "fr": "Compte 1 seulement. Vide : les voitures de tous les comptes de la personne. Pour n'en garder qu'un, saisissez l'identifiant donné par « Tester la connexion ».",
+        "de": "Nur Konto 1. Leer: die Autos aller Konten der Person. Um nur eines zu nutzen, gib die von „Verbindung testen“ angezeigte ID ein.",
+        "es": "Solo la cuenta 1. Vacío: los coches de todas las cuentas de la persona. Para usar solo una, introduzca el identificador que da «Probar la conexión»."
+      },
+      "required": false
+    },
+    {
+      "key": "section_2",
+      "type": "section",
+      "label": {
+        "en": "Account 2 (optional)",
+        "fr": "Compte 2 (facultatif)",
+        "de": "Konto 2 (optional)",
+        "es": "Cuenta 2 (opcional)"
+      },
+      "description": {
+        "en": "Another MY Renault or MY Dacia account, for example the one of another driver of the household: its cars are added to the others. Same country as the first account.",
+        "fr": "Un autre compte MY Renault ou MY Dacia, par exemple celui d'un autre conducteur du foyer : ses voitures s'ajoutent aux autres. Même pays que le premier compte.",
+        "de": "Ein weiteres MY-Renault- oder MY-Dacia-Konto, zum Beispiel das einer anderen Person im Haushalt: Seine Autos kommen zu den anderen hinzu. Gleiches Land wie beim ersten Konto.",
+        "es": "Otra cuenta MY Renault o MY Dacia, por ejemplo la de otro conductor del hogar: sus coches se suman a los demás. Mismo país que la primera cuenta."
+      }
+    },
+    {
+      "key": "username_2",
+      "type": "string",
+      "label": {
+        "en": "E-mail address of account 2",
+        "fr": "Adresse e-mail du compte 2",
+        "de": "E-Mail-Adresse von Konto 2",
+        "es": "Correo electrónico de la cuenta 2"
+      },
+      "description": {
+        "en": "Leave empty if you have no other account.",
+        "fr": "Laissez vide si vous n'avez pas d'autre compte.",
+        "de": "Leer lassen, wenn du kein weiteres Konto hast.",
+        "es": "Déjelo vacío si no tiene otra cuenta."
+      },
+      "placeholder": {
+        "en": "name@example.com",
+        "fr": "nom@exemple.fr",
+        "de": "name@beispiel.de",
+        "es": "nombre@ejemplo.es"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "password_2",
+      "type": "secret",
+      "label": {
+        "en": "Password of account 2",
+        "fr": "Mot de passe du compte 2",
+        "de": "Passwort von Konto 2",
+        "es": "Contraseña de la cuenta 2"
+      },
+      "description": {
+        "en": "Used to sign in only, like the first password.",
+        "fr": "Sert uniquement à se connecter, comme le premier mot de passe.",
+        "de": "Dient nur zur Anmeldung, wie das erste Passwort.",
+        "es": "Solo sirve para iniciar sesión, como la primera contraseña."
+      },
+      "required": false
+    },
+    {
+      "key": "section_3",
+      "type": "section",
+      "label": {
+        "en": "Account 3 (optional)",
+        "fr": "Compte 3 (facultatif)",
+        "de": "Konto 3 (optional)",
+        "es": "Cuenta 3 (opcional)"
+      },
+      "description": {
+        "en": "Another MY Renault or MY Dacia account, for example the one of another driver of the household: its cars are added to the others. Same country as the first account.",
+        "fr": "Un autre compte MY Renault ou MY Dacia, par exemple celui d'un autre conducteur du foyer : ses voitures s'ajoutent aux autres. Même pays que le premier compte.",
+        "de": "Ein weiteres MY-Renault- oder MY-Dacia-Konto, zum Beispiel das einer anderen Person im Haushalt: Seine Autos kommen zu den anderen hinzu. Gleiches Land wie beim ersten Konto.",
+        "es": "Otra cuenta MY Renault o MY Dacia, por ejemplo la de otro conductor del hogar: sus coches se suman a los demás. Mismo país que la primera cuenta."
+      }
+    },
+    {
+      "key": "username_3",
+      "type": "string",
+      "label": {
+        "en": "E-mail address of account 3",
+        "fr": "Adresse e-mail du compte 3",
+        "de": "E-Mail-Adresse von Konto 3",
+        "es": "Correo electrónico de la cuenta 3"
+      },
+      "description": {
+        "en": "Leave empty if you have no other account.",
+        "fr": "Laissez vide si vous n'avez pas d'autre compte.",
+        "de": "Leer lassen, wenn du kein weiteres Konto hast.",
+        "es": "Déjelo vacío si no tiene otra cuenta."
+      },
+      "placeholder": {
+        "en": "name@example.com",
+        "fr": "nom@exemple.fr",
+        "de": "name@beispiel.de",
+        "es": "nombre@ejemplo.es"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "password_3",
+      "type": "secret",
+      "label": {
+        "en": "Password of account 3",
+        "fr": "Mot de passe du compte 3",
+        "de": "Passwort von Konto 3",
+        "es": "Contraseña de la cuenta 3"
+      },
+      "description": {
+        "en": "Used to sign in only, like the first password.",
+        "fr": "Sert uniquement à se connecter, comme le premier mot de passe.",
+        "de": "Dient nur zur Anmeldung, wie das erste Passwort.",
+        "es": "Solo sirve para iniciar sesión, como la primera contraseña."
       },
       "required": false
     },
@@ -530,10 +644,10 @@
         "es": "Probar la conexión"
       },
       "description": {
-        "en": "Signs in and lists the vehicles of the saved account. No car is woken.",
-        "fr": "Se connecte et liste les véhicules du compte enregistré. Aucune voiture n'est réveillée.",
-        "de": "Meldet sich an und listet die Fahrzeuge des gespeicherten Kontos auf. Kein Auto wird geweckt.",
-        "es": "Inicia sesión y muestra los vehículos de la cuenta guardada. No se despierta ningún coche."
+        "en": "Signs in and lists the vehicles of each saved account. No car is woken.",
+        "fr": "Se connecte et liste les véhicules de chaque compte enregistré. Aucune voiture n'est réveillée.",
+        "de": "Meldet sich an und listet die Fahrzeuge jedes gespeicherten Kontos auf. Kein Auto wird geweckt.",
+        "es": "Inicia sesión y muestra los vehículos de cada cuenta guardada. No se despierta ningún coche."
       },
       "timeout_seconds": 60
     },
@@ -546,10 +660,10 @@
         "es": "Enviar el código de verificación"
       },
       "description": {
-        "en": "Only if your account asks for it: e-mails a code to the address of the account.",
-        "fr": "Seulement si votre compte le demande : envoie un code par e-mail à l'adresse du compte.",
-        "de": "Nur wenn dein Konto es verlangt: sendet einen Code an die E-Mail-Adresse des Kontos.",
-        "es": "Solo si su cuenta lo pide: envía un código al correo de la cuenta."
+        "en": "Only if an account asks for it: e-mails a code to the first account waiting for one.",
+        "fr": "Seulement si un compte le demande : envoie un code par e-mail au premier compte qui l'attend.",
+        "de": "Nur wenn ein Konto es verlangt: sendet einen Code per E-Mail an das erste Konto, das darauf wartet.",
+        "es": "Solo si una cuenta lo pide: envía un código por correo a la primera cuenta que lo espera."
       },
       "timeout_seconds": 60
     },

@@ -116,6 +116,10 @@ export function createRenault({
   clientFactory = defaultClientFactory,
   now = Date.now,
   timers = true,
+  // Accounts (src/accounts.js): the slot of this account, and whether another
+  // account already brings a car (a car shared by two accounts is read once).
+  slot = 1,
+  ownedElsewhere = () => false,
 }) {
   let config = null;
   let client = null;
@@ -536,7 +540,7 @@ export function createRenault({
     accountMissing = Boolean(config.account_id) && found.length === 0;
     const seen = new Set();
     for (const info of found) {
-      if (seen.has(info.vin)) continue;
+      if (seen.has(info.vin) || ownedElsewhere(info.vin)) continue;
       seen.add(info.vin);
       const existing = vehicles.get(info.vin);
       if (existing) {
@@ -717,7 +721,7 @@ export function createRenault({
       return;
     }
     const fingerprint = store.fingerprint(config);
-    client = clientFactory(config, store.sessionStore(fingerprint));
+    client = clientFactory(config, store.sessionStore(fingerprint, slot));
     const ok = await connect();
     startTicker();
     if (ok) logger.info(`Renault / Dacia: ${vehicles.size} vehicle(s)`);
@@ -725,9 +729,10 @@ export function createRenault({
 
   async function restart(newConfig) {
     await stop();
+    // Only this account's cars: the other accounts keep what Gladys has.
+    for (const vin of vehicles.keys()) gladys.forgetPublishedStates(vehicleIds(gladys, vin).device);
     vehicles.clear();
     publishedDevicesJson = null;
-    gladys.forgetPublishedStates();
     await start(newConfig);
     nudgeWidget(WIDGET_KEYS.VEHICLE);
   }
@@ -989,6 +994,17 @@ export function createRenault({
     },
     get blocked() {
       return blocked;
+    },
+    /** A code was e-mailed and waits for "Enter the code". */
+    get tfaPending() {
+      return Boolean(client?.tfaPending);
+    },
+    /** Whether a car of this account is this Gladys device. */
+    owns(deviceExternalId) {
+      return findVehicle(deviceExternalId) !== null;
+    },
+    hasVehicle(vin) {
+      return vehicles.has(vin);
     },
     // Exposed for the tests.
     _vehicles: vehicles,

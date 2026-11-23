@@ -33,7 +33,8 @@ pushing.
 ```
 index.js                          SDK wiring only (src/app.js registers the handlers)
 src/app.js                        handlers of the Gladys client, shared with the tests
-src/renault.js                    runtime: timer, reads, publication, commands, trigger, 2FA
+src/accounts.js                   up to 3 accounts: one runtime each, merged devices and status
+src/renault.js                    runtime of one account: timer, reads, publication, commands, 2FA
 src/renault/client.js             cloud client: Gigya session + Kamereon calls and commands
 src/renault/gigya.js              sign-in, JWT, two-step verification (e-mailed code)
 src/renault/endpoints.js          per-model endpoint table (generated from renault-api)
@@ -254,6 +255,15 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
   pas d'arrêt de charge à distance. Spring et Zoe 2 : `charge/pause-resume`. Mode de charge : l'action
   prend `always_charging` / `schedule_mode`, la lecture rend `always`/`scheduled` (Zoe 2, via
   `charging-settings`) ou `always_charging`/`schedule_mode` (Zoe 1, `charge-mode`).
+- **Plusieurs comptes** (`src/accounts.js`, demande de gaetanb76, t/11505) : un runtime par compte
+  derrière un proxy de `gladys` qui fusionne `publishDiscoveredDevices` (le cœur remplace toute la
+  liste à chaque envoi) et `setConnectionStatus` (le premier compte en erreur, préfixé « Compte 2 : »).
+  Session du compte 1 dans `session` (inchangé), des autres dans `sessions[slot]`. Une voiture
+  partagée appartient au premier compte qui la liste (`ownedElsewhere`). Les comptes 2 et 3 reprennent
+  le pays du compte 1 et n'ont pas de filtre `account_id`. Les `external_id` viennent du VIN : figé
+  par `test/accounts.test.js`.
+- Hybrides non rechargeables : aucune distance « en électrique » dans Kamereon (`cockpit` ne donne que
+  `totalMileage`, `fuelAutonomy`, `fuelQuantity` ; vérifié dans renault-api le 23/11/2026).
 - La Zoe phase 1 (X101VE) donne la puissance de charge en **watts**, les autres en kW.
 - Pas de type Gladys pour une position : `text/text` « lat, lon » (désactivée par défaut, jamais lue
   sinon). Une « distance au domicile » demanderait `location: true` (accès aux coordonnées des

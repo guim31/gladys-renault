@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-25
+
 ### Added
 
 - Up to three MY Renault / MY Dacia accounts in one integration ("Account 2" and "Account 3" in the
@@ -36,5 +38,6 @@ the notes of the version's GitHub Release.
 - Dashboard widget "Renault / Dacia car".
 - Documentation in English, French, German and Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-renault/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/guim31/gladys-renault/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/guim31/gladys-renault/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/guim31/gladys-renault/releases/tag/v1.0.1

@@ -21,18 +21,26 @@ Sans lien avec Renault ou Dacia. Développée sans le matériel : vos retours so
 
 Dans Gladys, **Intégrations → Renault / Dacia → Configuration** :
 
-| Champ                       | Quoi saisir                                                                                                                                |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Pays du compte              | Le pays et la langue de votre application (ex. « France — Français »). Ils déterminent les serveurs du compte.                             |
-| Adresse e-mail              | L'adresse e-mail du compte.                                                                                                                |
-| Mot de passe                | Son mot de passe. Il sert uniquement à se connecter : la session ouverte est ensuite conservée dans le stockage de l'intégration.          |
-| Compte (facultatif)         | Vide : les voitures de tous les comptes de la personne. Pour n'en garder qu'un, saisissez l'identifiant donné par « Tester la connexion ». |
-| Langue des noms d'appareils | La langue des noms de fonctionnalités (français par défaut). Gladys garde un nom une fois l'appareil créé.                                 |
-| Relevé                      | Fréquence de lecture du cloud : toutes les 10, 15 (par défaut), 30 ou 60 minutes.                                                          |
-| Position GPS                | Désactivée par défaut. Activée : la dernière position envoyée par la voiture est lue et affichée.                                          |
+| Champ                       | Quoi saisir                                                                                                                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pays du compte              | Le pays et la langue de votre application (ex. « France — Français »). Ils déterminent les serveurs du compte.                                                                                |
+| Adresse e-mail              | L'adresse e-mail du compte.                                                                                                                                                                   |
+| Mot de passe                | Son mot de passe. Il sert uniquement à se connecter : la session ouverte est ensuite conservée dans le stockage de l'intégration.                                                             |
+| Compte (facultatif)         | Vide : les voitures de tous les comptes de la personne. Pour n'en garder qu'un, saisissez l'identifiant donné par « Tester la connexion ».                                                    |
+| Compte 2, compte 3          | Facultatifs : l'adresse e-mail et le mot de passe d'autres comptes MY Renault / MY Dacia (même pays), par exemple celui d'un autre conducteur du foyer. Leurs voitures s'ajoutent aux autres. |
+| Langue des noms d'appareils | La langue des noms de fonctionnalités (français par défaut). Gladys garde un nom une fois l'appareil créé.                                                                                    |
+| Relevé                      | Fréquence de lecture du cloud : toutes les 10, 15 (par défaut), 30 ou 60 minutes.                                                                                                             |
+| Position GPS                | Désactivée par défaut. Activée : la dernière position envoyée par la voiture est lue et affichée.                                                                                             |
 
 Enregistrez, puis cliquez sur **Tester la connexion** : le résultat liste les voitures du compte,
 ou dit en rouge ce qui ne va pas. Ouvrez ensuite l'onglet **Découverte** et ajoutez vos voitures.
+
+**Plusieurs comptes.** Chaque conducteur peut garder sa voiture sur son propre compte MY Renault /
+MY Dacia (et garder l'application, la position et les notifications) : saisissez jusqu'à deux autres
+comptes dans « Compte 2 » et « Compte 3 ». Chaque compte a sa session, son quota du cloud et ses
+erreurs ; « Tester la connexion » les teste tous. Une voiture partagée par deux comptes n'apparaît
+qu'une fois. L'identifiant d'un appareil vient du VIN de la voiture, pas du compte : ajouter un compte
+ou passer une voiture sur un autre compte garde son appareil, son historique et ses scènes.
 
 ## Vérification en deux étapes
 
@@ -46,6 +54,10 @@ configuration affiche alors « Votre compte demande un code envoyé par e-mail �
 L'installation est ensuite reconnue par le compte pendant 30 jours environ, et la session est
 conservée : aucun code n'est demandé à chaque redémarrage. Un code faux peut être saisi à nouveau ;
 un code trop ancien demande un nouvel **Envoyer le code de vérification**.
+
+Avec plusieurs comptes, **Envoyer le code de vérification** s'adresse au premier compte qui attend
+un code, et **Saisir le code** au compte à qui il a été envoyé ; le résultat dit de quel compte il
+s'agit (« Compte 2 : … »). Si deux comptes attendent un code, faites-les l'un après l'autre.
 
 ## Appareils
 
@@ -178,6 +190,7 @@ paraître périmée.
 - Les commandes passent par le cloud Renault : quand il est en panne, rien ne marche, et il peut
   changer sans prévenir.
 - La position est publiée en texte ; pas de distance au domicile.
+- Hybrides non rechargeables (E-Tech full hybrid) : la distance parcourue en mode électrique, affichée dans la voiture, n'est pas envoyée par le cloud MY Renault (ni renault-api ni Home Assistant ne la lisent) ; seuls le kilométrage total et le carburant le sont.
 
 ## Crédits
 

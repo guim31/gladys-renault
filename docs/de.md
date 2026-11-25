@@ -21,18 +21,26 @@ Nicht mit Renault oder Dacia verbunden. Ohne die Hardware entwickelt: Rückmeldu
 
 In Gladys **Integrationen → Renault / Dacia → Konfiguration**:
 
-| Feld                    | Was du einträgst                                                                                                        |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Land des Kontos         | Land und Sprache deiner App (z. B. „Deutschland — Deutsch“). Davon hängen die Server des Kontos ab.                     |
-| E-Mail-Adresse          | Die E-Mail-Adresse des Kontos.                                                                                          |
-| Passwort                | Sein Passwort. Es dient nur zur Anmeldung: Die geöffnete Sitzung wird danach im Speicher der Integration aufbewahrt.    |
-| Konto (optional)        | Leer: die Autos aller Konten der Person. Um nur ein Konto zu nutzen, gib die von „Verbindung testen“ angezeigte ID ein. |
-| Sprache der Gerätenamen | Die Sprache der Funktionsnamen (standardmäßig Französisch). Gladys behält einen Namen, sobald das Gerät erstellt ist.   |
-| Abfrage                 | Wie oft die Cloud gelesen wird: alle 10, 15 (Standard), 30 oder 60 Minuten.                                             |
-| GPS-Position            | Standardmäßig aus. An: Die zuletzt vom Auto gesendete Position wird gelesen und angezeigt.                              |
+| Feld                    | Was du einträgst                                                                                                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Land des Kontos         | Land und Sprache deiner App (z. B. „Deutschland — Deutsch“). Davon hängen die Server des Kontos ab.                                                                                     |
+| E-Mail-Adresse          | Die E-Mail-Adresse des Kontos.                                                                                                                                                          |
+| Passwort                | Sein Passwort. Es dient nur zur Anmeldung: Die geöffnete Sitzung wird danach im Speicher der Integration aufbewahrt.                                                                    |
+| Konto (optional)        | Leer: die Autos aller Konten der Person. Um nur ein Konto zu nutzen, gib die von „Verbindung testen“ angezeigte ID ein.                                                                 |
+| Konto 2, Konto 3        | Optional: E-Mail-Adresse und Passwort weiterer MY-Renault-/MY-Dacia-Konten (gleiches Land), zum Beispiel das einer anderen Person im Haushalt. Deren Autos kommen zu den anderen hinzu. |
+| Sprache der Gerätenamen | Die Sprache der Funktionsnamen (standardmäßig Französisch). Gladys behält einen Namen, sobald das Gerät erstellt ist.                                                                   |
+| Abfrage                 | Wie oft die Cloud gelesen wird: alle 10, 15 (Standard), 30 oder 60 Minuten.                                                                                                             |
+| GPS-Position            | Standardmäßig aus. An: Die zuletzt vom Auto gesendete Position wird gelesen und angezeigt.                                                                                              |
 
 Speichere und klicke dann auf **Verbindung testen**: Das Ergebnis listet die Autos des Kontos auf
 oder sagt in Rot, was nicht stimmt. Öffne dann den Reiter **Entdecken** und füge deine Autos hinzu.
+
+**Mehrere Konten.** Jede Person kann ihr Auto in ihrem eigenen MY-Renault-/MY-Dacia-Konto behalten
+(samt App, Position und Benachrichtigungen): Trage bis zu zwei weitere Konten unter „Konto 2“ und
+„Konto 3“ ein. Jedes Konto hat seine eigene Sitzung, sein eigenes Kontingent der Cloud und seine
+eigenen Fehler; „Verbindung testen“ prüft alle. Ein Auto, das zwei Konten teilen, erscheint nur
+einmal. Die ID eines Geräts stammt von der FIN des Autos, nicht vom Konto: Ein neues Konto oder ein
+Auto, das in ein anderes Konto wechselt, behält sein Gerät, seinen Verlauf und seine Szenen.
 
 ## Zwei-Schritt-Bestätigung
 
@@ -46,6 +54,10 @@ Konfigurationsseite zeigt dann „Dein Konto verlangt einen per E-Mail gesendete
 Die Installation wird danach etwa 30 Tage lang vom Konto wiedererkannt, und die Sitzung bleibt
 erhalten: Bei einem Neustart wird kein Code verlangt. Einen falschen Code kannst du erneut eingeben;
 ein zu alter Code braucht ein neues **Bestätigungscode senden**.
+
+Mit mehreren Konten geht **Bestätigungscode senden** an das erste Konto, das auf einen Code wartet,
+und **Code eingeben** an das Konto, an das er gesendet wurde; das Ergebnis nennt das Konto („Konto 2:
+…“). Warten zwei Konten auf einen Code, erledige sie nacheinander.
 
 ## Geräte
 
@@ -176,6 +188,7 @@ nie veraltet wirkt.
 - Die Befehle laufen über die Renault-Cloud: Fällt sie aus, geht nichts, und sie kann sich ohne
   Vorwarnung ändern.
 - Die Position wird als Text veröffentlicht; keine Entfernung zum Zuhause.
+- Vollhybride (E-Tech, nicht aufladbar): Die im Auto angezeigte elektrisch gefahrene Strecke sendet die MY-Renault-Cloud nicht (weder renault-api noch Home Assistant lesen sie); nur der Gesamtkilometerstand und der Kraftstoff kommen an.
 
 ## Danksagung
 

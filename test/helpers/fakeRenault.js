@@ -100,8 +100,14 @@ const ERROR_STATUS = {
  * @param {() => number} [options.now] the clock of the JWT expiries
  * @param {boolean} [options.tfa] the account asks for an e-mailed code
  * @param {object} [options.vehicles] the vehicles answer of account-id-1
+ * @param {string} [options.username] the address of the account (another account)
  */
-export function createFakeRenault({ now = () => Date.now(), tfa = false, vehicles } = {}) {
+export function createFakeRenault({
+  now = () => Date.now(),
+  tfa = false,
+  vehicles,
+  username = USERNAME,
+} = {}) {
   const fake = {
     calls: [],
     actions: [],
@@ -109,6 +115,7 @@ export function createFakeRenault({ now = () => Date.now(), tfa = false, vehicle
     vehicles: vehicles ?? fixture('kamereon/vehicles'),
     // `${vin}:${endpoint}` → error fixture name (kamereon/error/...)
     errors: new Map(),
+    username,
     password: PASSWORD,
     tfa,
     network: true,
@@ -137,7 +144,7 @@ export function createFakeRenault({ now = () => Date.now(), tfa = false, vehicle
     switch (path) {
       case '/accounts.login': {
         fake.loginCount += 1;
-        if (params.get('loginID') !== USERNAME || params.get('password') !== fake.password) {
+        if (params.get('loginID') !== fake.username || params.get('password') !== fake.password) {
           return json(gigyaFixture('login.403042'));
         }
         if (fake.tfa && !fake.trustedGmids.has(cookies.gmid)) {

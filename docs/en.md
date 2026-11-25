@@ -19,18 +19,26 @@ Not affiliated with Renault or Dacia. Developed without the hardware: feedback w
 
 In Gladys, **Integrations → Renault / Dacia → Configuration**:
 
-| Field                  | What to enter                                                                                                     |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Country of the account | The country and language of your app (e.g. "France — Français"). It decides the servers of the account.           |
-| E-mail address         | The e-mail address of the account.                                                                                |
-| Password               | Its password. It is used to sign in only: the session it opens is then kept in the integration's storage.         |
-| Account (optional)     | Empty: the cars of every account of the person. To keep one account, enter the id shown by "Test the connection". |
-| Device names language  | The language of the feature names (French by default). Gladys keeps a name once the device is created.            |
-| Refresh                | How often the cloud is read: every 10, 15 (default), 30 or 60 minutes.                                            |
-| GPS position           | Off by default. On: the last position the car sent is read and shown.                                             |
+| Field                  | What to enter                                                                                                                                                                                 |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Country of the account | The country and language of your app (e.g. "France — Français"). It decides the servers of the account.                                                                                       |
+| E-mail address         | The e-mail address of the account.                                                                                                                                                            |
+| Password               | Its password. It is used to sign in only: the session it opens is then kept in the integration's storage.                                                                                     |
+| Account (optional)     | Empty: the cars of every account of the person. To keep one account, enter the id shown by "Test the connection".                                                                             |
+| Account 2, account 3   | Optional: the e-mail address and password of other MY Renault / MY Dacia accounts (same country), for example the one of another driver of the household. Their cars are added to the others. |
+| Device names language  | The language of the feature names (French by default). Gladys keeps a name once the device is created.                                                                                        |
+| Refresh                | How often the cloud is read: every 10, 15 (default), 30 or 60 minutes.                                                                                                                        |
+| GPS position           | Off by default. On: the last position the car sent is read and shown.                                                                                                                         |
 
 Save, then click **Test the connection**: it lists the cars of the account, or says in red what is
 wrong. Then open the **Discovery** tab and add your cars.
+
+**Several accounts.** Each driver can keep their car in their own MY Renault / MY Dacia account
+(and keep the app, the position and the notifications): enter up to two more accounts in
+"Account 2" and "Account 3". Each account has its own session, its own cloud quota and its own
+errors; "Test the connection" tests them all. A car shared by two accounts appears once. A device id
+comes from the car's VIN, not from the account: adding an account or moving a car to another account
+keeps its device, its history and its scenes.
 
 ## Two-step verification
 
@@ -43,6 +51,10 @@ Some accounts ask for a code sent by e-mail at each new sign-in. The configurati
 The installation is then remembered by the account for about 30 days, and the session is kept: no
 code is asked at each restart. A wrong code can be typed again; an old one needs a new
 **Send the verification code**.
+
+With several accounts, **Send the verification code** goes to the first account waiting for a code,
+and **Enter the code** to the account it was sent for; the result says which account ("Account 2: …").
+If two accounts wait for a code, do one after the other.
 
 ## Devices
 
@@ -163,6 +175,7 @@ Gladys again every 12 hours, so it never shows as stale.
 - The commands go through the Renault cloud: when it is down, nothing works, and it may change
   without notice.
 - The position is published as text; no distance from home.
+- Full hybrids (E-Tech, non plug-in): the distance driven in electric mode, shown in the car, is not sent by the MY Renault cloud (neither renault-api nor Home Assistant read it); only the total mileage and the fuel are.
 
 ## Credits
 
